@@ -36,6 +36,8 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   `main` with the plan's signatures (`createCall`, `updateCall`, `claimCall`, `getCallByConversationId`, `logAudit`,
   etc.). `GET /api/invoices` returns 18 seeded rows and `GET /api/invoices/:id` returns `InvoiceDetail` (404 for a bad id),
   both checked against Neon. `challenge_answer` is always nulled in the detail response.
+- **2026-11-14 15:22** → P3: **Task 1.3 is pushed** (`7491008`). `applyDecision(invoiceId, callId, outcome)` and
+  `decide(outcome)` are in `src/lib/decision.ts`. `applyDecision` is compare-and-set on `verifying`, so calling it twice is safe.
 
 ---
 
