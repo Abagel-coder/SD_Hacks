@@ -1,6 +1,6 @@
 import { generateJson } from '../gemini/client';
 import { normalizeDomain } from '../risk/domains';
-import { fetchPage, googleSearch } from './client';
+import { fetchPage, googleSearch, type SerpResult } from './client';
 import { pickOfficialDomain, toE164 } from './parse';
 
 const CONTACT_SCHEMA = {
@@ -15,10 +15,17 @@ const CONTACT_SCHEMA = {
 export async function lookupPublicFacts(vendorName: string): Promise<{
   realDomain: string | null; officialPhone: string | null; publicEmail: string | null; sources: string[];
 }> {
-  const [siteResults, contactResults] = await Promise.all([
+  // Either search can fail upstream on its own (seen live: 502s and 429s), so one failure is
+  // tolerated: the surviving result list is used for both purposes. Both failing throws.
+  const [siteSearch, contactSearch] = await Promise.allSettled([
     googleSearch(`${vendorName} official website`),
     googleSearch(`${vendorName} customer service phone number contact us`),
   ]);
+  if (siteSearch.status === 'rejected' && contactSearch.status === 'rejected') throw siteSearch.reason;
+  if (siteSearch.status === 'rejected') console.error('Site search failed, using contact results', siteSearch.reason);
+  if (contactSearch.status === 'rejected') console.error('Contact search failed, using site results', contactSearch.reason);
+  const siteResults = siteSearch.status === 'fulfilled' ? siteSearch.value : (contactSearch as PromiseFulfilledResult<SerpResult[]>).value;
+  const contactResults = contactSearch.status === 'fulfilled' ? contactSearch.value : siteResults;
   const realDomain = pickOfficialDomain(siteResults, vendorName);
   const sources: string[] = [];
 
@@ -28,7 +35,7 @@ export async function lookupPublicFacts(vendorName: string): Promise<{
   let pageText = '';
   if (ownPage) {
     try {
-      pageText = (await fetchPage(ownPage, true)).slice(0, 20_000);
+      pageText = (await fetchPage(ownPage, true, 8_000)).slice(0, 20_000);
       sources.push(ownPage);
     } catch (err) {
       console.error('Contact page fetch failed', err);
@@ -37,7 +44,7 @@ export async function lookupPublicFacts(vendorName: string): Promise<{
 
   const snippets = contactResults.slice(0, 8)
     .map((r) => `${r.link}\n${r.title}\n${r.description}`).join('\n\n');
-  sources.push(...contactResults.slice(0, 3).map((r) => r.link));
+  sources.push(...contactResults.map((r) => r.link).filter((link) => normalizeDomain(link) !== 'google.com').slice(0, 3));
 
   const contact = await generateJson<{ phone: string; email: string }>([{
     type: 'text',

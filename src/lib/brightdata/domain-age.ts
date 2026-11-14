@@ -4,7 +4,7 @@ import { registrationAgeDays } from './parse';
 export async function lookupDomainAgeDays(domain: string): Promise<number | null> {
   const url = `https://rdap.org/domain/${encodeURIComponent(domain)}`;
   try {
-    return registrationAgeDays(JSON.parse(await fetchPage(url)), new Date());
+    return registrationAgeDays(JSON.parse(await fetchPage(url, false, 8_000)), new Date());
   } catch (err) {
     console.error('RDAP through Bright Data failed, trying direct', err);
   }
