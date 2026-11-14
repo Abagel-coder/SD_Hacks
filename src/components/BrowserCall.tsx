@@ -1,5 +1,70 @@
 'use client';
 
+import { ConversationProvider, useConversationControls, useConversationStatus } from '@elevenlabs/react';
+import { useEffect, useRef, useState } from 'react';
+
+function CallControls({ callId }: { callId: string }) {
+  const { startSession, endSession } = useConversationControls();
+  const { status } = useConversationStatus();
+  const [error, setError] = useState<string | null>(null);
+  const wasConnected = useRef(false);
+  const conversationId = useRef<string | null>(null);
+
+  async function start() {
+    setError(null);
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      const res = await fetch(`/api/calls/${callId}/browser-session`);
+      if (!res.ok) throw new Error('Could not load the call details.');
+      const session = (await res.json()) as { agentId: string; dynamicVariables: Record<string, string> };
+      // startSession returns nothing; the conversation id and connection errors arrive by callback.
+      startSession({
+        agentId: session.agentId,
+        dynamicVariables: session.dynamicVariables,
+        onConnect: ({ conversationId: id }) => { conversationId.current = id; },
+        onError: (message) => setError(message),
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not start the browser call.');
+    }
+  }
+
+  useEffect(() => {
+    if (status === 'connected') wasConnected.current = true;
+    if (status === 'disconnected' && wasConnected.current) {
+      wasConnected.current = false;
+      void fetch(`/api/calls/${callId}/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversationId: conversationId.current }),
+      });
+    }
+  }, [status, callId]);
+
+  return (
+    <div className="space-y-2">
+      {status === 'connected' ? (
+        <button onClick={() => endSession()} className="rounded bg-red-600 px-3 py-2 text-sm font-medium text-white">
+          End call
+        </button>
+      ) : (
+        <button onClick={start} disabled={status === 'connecting'}
+          className="rounded bg-gray-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50">
+          {status === 'connecting' ? 'Connecting…' : 'Start browser call'}
+        </button>
+      )}
+      <p className="text-sm text-gray-600">
+        {status === 'connected' ? 'The agent is speaking. Answer as the vendor.' : 'Uses this device\'s microphone and speaker.'}
+      </p>
+      {error && <p className="text-sm text-red-700">{error}</p>}
+    </div>
+  );
+}
+
 export function BrowserCall({ callId }: { callId: string }) {
-  return <p className="text-sm text-gray-500">Browser call for {callId} is not built yet.</p>;
+  return (
+    <ConversationProvider>
+      <CallControls callId={callId} />
+    </ConversationProvider>
+  );
 }
