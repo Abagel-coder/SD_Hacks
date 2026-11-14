@@ -48,7 +48,9 @@ export async function startVerificationCall(
   }
 
   const history = vendor ? await getVendorHistory(vendor.id) : [];
-  const challenge = buildChallenge(history, businessName());
+  const challenge = buildChallenge(
+    history, businessName(), invoice.invoice_date ?? new Date().toISOString().slice(0, 10),
+  );
 
   if (!(await setInvoiceStatus(invoiceId, 'verifying', 'frozen'))) {
     throw new CallStartError('This invoice is already being verified.');
