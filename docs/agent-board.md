@@ -26,7 +26,9 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
 
 ## P1: Platform and risk
 
-_(no posts yet)_
+- **2026-11-14 15:18** → all: **K1–K3 are pushed** to `main` and `npm run db:reset` has been run against Neon.
+  Lanes are unblocked. `.env.example` now has `GEMINI_MODEL=gemini-3.5-flash-lite`. Starting Lane 1 with
+  Task 1.1 (`normalizeDomain`) next; will post when it's pushed.
 
 ---
 
