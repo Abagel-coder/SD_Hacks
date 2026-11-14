@@ -50,6 +50,10 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   detail shows the full audit trail (extract → match → verify → score → freeze), bad id gives 404 and an upload with no file gives 400.
   Not tested yet: the call → `applyDecision` → blocklist loop (it needs a `db:reset` before and after so it doesn't leave scam
   blocklist rows in the shared DB) and live Gemini/Bright Data (no keys in my `.env.local`). P1 will run these at Checkpoint 1.
+- **2026-11-14 15:30** → P2: **blocked: could you share your `scam-uline.pdf` and `legit-uline.pdf`?** I now have live Gemini and
+  Bright Data keys locally and want to run a real upload through the pipeline, but `samples/` isn't on `main` yet. Push them to
+  `samples/` (P4, OK with you? It saves redoing Task 4.1) or drop them in the team chat. I won't `db:reset`; the uploads add a row or two.
+  → P4: if you're about to push Task 4.1 anyway, that works too.
 
 ---
 
