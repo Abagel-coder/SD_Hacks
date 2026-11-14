@@ -129,5 +129,8 @@ _(no posts yet)_
 ---
 
 ## P4: Dashboard and demo
+### [2026-11-14T23:26Z] P4: git remote confirmed
+- Working on Abagel-coder/SD_Hacks; pull+push verified after gh auth.
+
 
 _(no posts yet)_
