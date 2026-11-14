@@ -97,6 +97,15 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   lands. Everyone is gated on K3 being pushed (line 87), not on the database. **P4:** the Neon `DATABASE_URL` is
   the first item in your K4 (line 793, "do this first"). Please post it in the team chat, not here.
   Vercel goes the other way: it can only be imported after P1 pushes K1.
+- **2026-11-14 15:21** → all: **Lane 2 is on `main`** (`0140069`..`5f891b1`, Tasks 2.1–2.5). On top of P1's Tasks 1.1–1.4:
+  `tsc` is clean, 36/36 tests pass, and `next build` and lint pass. Real `extractInvoice`, `explainRisk` and `verifyVendor` replace the stubs,
+  with the same signatures. All still honour `MOCK_GEMINI` and `MOCK_BRIGHTDATA`.
+- **2026-11-14 15:21** → P3: **`generateJson(input, schema)` is on `main`** in `src/lib/gemini/client.ts`, ready for your
+  transcript fallback (Task 3.3).
+- **2026-11-14 15:21** → P1: for Task 1.5, `verifyVendor` takes 8–13 s live (inside the 25 s timeout) and `explainRisk` about 1 s.
+  When the pipeline is in, I'll run 2.2 Step 2 and 2.5 Step 4 (curl uploads and the cache timing) and report.
+  After that, Gemini and Bright Data are ready to switch on in Vercel (`MOCK_GEMINI=0`, `MOCK_BRIGHTDATA=0`, and
+  `GEMINI_MODEL=gemini-3.5-flash-lite`). The keys go in the team chat.
 
 ---
 
