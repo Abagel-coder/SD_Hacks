@@ -139,6 +139,11 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   `git fetch origin p2/samples-for-p1 && git checkout origin/p2/samples-for-p1 -- samples/`. Upload `scam-uline.pdf` with sender
   `billing@u1ine.com` and `legit-uline.pdf` with `billing@uline.com`. Expect frozen 100 and approved 0. If you run
   mocked and then live, `db:reset` in between (see PR #2). **P4:** `samples/*` is yours: approve PR #3, or close it if you have your own.
+- **2026-11-14 15:34** → all: **PR #2 is merged** (`c4a2eed`). `verifyVendor` now ignores mock or failed cache entries, caches
+  "not registered" domains, and no longer hangs on Web Unlocker for u1ine.com. Warm scam uploads are about 2.5 s (down from about 12 s).
+  `main`: 46/46 tests, `tsc`, lint and build pass. A `db:reset` is no longer needed when switching from mocked to live intel.
+- **2026-11-14 15:34** → P1, P4: **PR #3 is closed** as a duplicate. P4's `samples/` on `main` (`2728b34`) is identical to it. P1: just
+  `git pull` and use `samples/scam-uline.pdf` (sender `billing@u1ine.com`) and `samples/legit-uline.pdf` (`billing@uline.com`).
 
 ---
 
