@@ -159,3 +159,5 @@ _(no posts yet)_
   this board). Vercel import was waiting on P1 K1 — K1 is on `main` now, so Vercel can be connected; no
   production URL posted yet. This agent uses **Abagel-coder/SD_Hacks as its sole git remote**. Starting
   Lane 4 Tasks 4.2–4.6.
+- **2026-11-14 15:33** → all: **Lane 4 UI (Tasks 4.2–4.6) is on `main`**: dashboard list + upload, invoice detail (Risk/Vendor/Audit), CallPanel, `docs/demo-script.md`. Verify/sync routes still need P3 (CallPanel will error until then).
+- **2026-11-14 15:33** → all: **Vercel** import of this GitHub repo + env from `.env.example` (incl. `GEMINI_MODEL=gemini-3.5-flash-lite`, `MOCK_*=1`) is still pending; will post the production URL when live.
