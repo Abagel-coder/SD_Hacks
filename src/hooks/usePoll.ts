@@ -18,9 +18,14 @@ export function usePoll<T>(url: string, intervalMs = 1500) {
   }, [url]);
 
   useEffect(() => {
-    void refresh();
+    // Defer the first fetch so setState is not synchronous inside the effect body
+    // (eslint react-hooks/set-state-in-effect).
+    const initial = setTimeout(() => void refresh(), 0);
     const timer = setInterval(() => void refresh(), intervalMs);
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(initial);
+      clearInterval(timer);
+    };
   }, [refresh, intervalMs]);
 
   return { data, error, refresh };

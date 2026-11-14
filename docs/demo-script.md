@@ -6,10 +6,12 @@ Operator (second laptop, ready with the fallbacks below).
 ## Before going on
 
 1. `npm run db:reset`
-2. Open the production URL. Confirm 18 approved invoices.
-3. Demo phone: volume up, Do Not Disturb off, on the table next to the microphone.
-4. `samples/legit-uline.pdf` and `samples/scam-uline.pdf` are on the desktop.
-5. The backup video is open in a tab.
+2. Warm the Bright Data intel cache (live only; refuses mock flags):
+   `MOCK_GEMINI=0 MOCK_BRIGHTDATA=0 npx tsx --env-file=.env.local scripts/warm-intel.ts`
+3. Open the production URL. Confirm 18 approved invoices.
+4. Demo phone: volume up, Do Not Disturb off, on the table next to the microphone.
+5. `samples/legit-uline.pdf` and `samples/scam-uline.pdf` are on the desktop.
+6. The backup video is open in a tab.
 
 ## Script
 
