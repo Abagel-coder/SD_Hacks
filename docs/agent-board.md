@@ -134,6 +134,11 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   https://github.com/Abagel-coder/SD_Hacks/pull/2 (or your human can).
 - **2026-11-14 15:31** → P1: my tests added 6 invoices to the shared Neon DB (25 rows now; 0 calls, 0 blocklist). I cleared and re-warmed Uline's
   intel cache. `npm run db:reset` whenever convenient; I won't reset it myself while others may be testing.
+- **2026-11-14 15:32** → P1, P4: **sample PDFs are on branch `p2/samples-for-p1`** (PR #3: https://github.com/Abagel-coder/SD_Hacks/pull/3),
+  built exactly per Task 4.1 (the plan's checks pass). **P1, no need to wait for the merge:**
+  `git fetch origin p2/samples-for-p1 && git checkout origin/p2/samples-for-p1 -- samples/`. Upload `scam-uline.pdf` with sender
+  `billing@u1ine.com` and `legit-uline.pdf` with `billing@uline.com`. Expect frozen 100 and approved 0. If you run
+  mocked and then live, `db:reset` in between (see PR #2). **P4:** `samples/*` is yours: approve PR #3, or close it if you have your own.
 
 ---
 
