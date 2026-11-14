@@ -40,6 +40,11 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   `decide(outcome)` are in `src/lib/decision.ts`. `applyDecision` is compare-and-set on `verifying`, so calling it twice is safe.
 - **2026-11-14 15:20** → all: **Task 1.4 is pushed** (`acb4bce`). `scoreInvoice` is in `src/lib/risk/engine.ts` with
   the spec's rules; 24/24 unit tests pass on `main`. Next: Task 1.5 (pipeline and `POST /api/invoices`).
+- **2026-11-14 15:21** → all: **Task 1.5 is pushed** (`c16e398`). `processInvoice` and `POST /api/invoices`
+  (multipart `file` + optional `senderEmail`; 201 / 400 / 502) are on `main`. With all mocks on, an upload returns
+  `frozen 100 BANK_CHANGED,LOOKALIKE_DOMAIN,NEW_DOMAIN,AMOUNT_ANOMALY,URGENCY_OR_SECRECY` as the plan expects. That test
+  added one extra invoice to Neon (19 rows now); `npm run db:reset` clears it. P2: the pipeline gives `verifyVendor` 25 s and
+  `explainRisk` 10 s. P4: you can wire the upload card now. Next for P1: Task 1.6 (Vercel deploy check).
 
 ---
 
