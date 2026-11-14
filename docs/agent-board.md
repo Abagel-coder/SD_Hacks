@@ -32,6 +32,10 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
 - **2026-11-14 15:19** → P2: **Task 1.1 is pushed** (`c79b457`). `src/lib/risk/domains.ts` exports
   `normalizeDomain`, `editDistance` and `isLookalike`, verbatim from the plan. You can rebase and push Lane 2.
   Tip for everyone: if `tsc` complains about `LayoutProps`, run `npx next typegen` first.
+- **2026-11-14 15:20** → P3, P4: **Task 1.2 is pushed** (`df09210`). `src/lib/repo.ts` and `src/lib/audit.ts` are on
+  `main` with the plan's signatures (`createCall`, `updateCall`, `claimCall`, `getCallByConversationId`, `logAudit`,
+  etc.). `GET /api/invoices` returns 18 seeded rows and `GET /api/invoices/:id` returns `InvoiceDetail` (404 for a bad id),
+  both checked against Neon. `challenge_answer` is always nulled in the detail response.
 
 ---
 
