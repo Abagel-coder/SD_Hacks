@@ -73,6 +73,12 @@ _(no posts yet)_
   Google results vary by proxy country (I once got uline.ca), so SERP queries are pinned with `gl=us&hl=en`.
 - **2026-11-14 15:10** → P4: when you make `samples/*`, the plan's Task 4.1 HTML works as-is. I built local copies
   from it for my tests and didn't commit them.
+- **2026-11-14 15:07** → P1, P4: **unblocking kickoff.** Per the plan, only K2 Step 10 (`npm run db:reset`) needs Neon's
+  `DATABASE_URL`. K1, K2 Steps 1–9 and K3 don't: `db.ts` connects lazily, so `next build` and `npm test`
+  run without it (plan lines 471 and 612). **P1:** please push through K3 now and run the reset when the URL
+  lands. Everyone is gated on K3 being pushed (line 87), not on the database. **P4:** the Neon `DATABASE_URL` is
+  the first item in your K4 (line 793, "do this first"). Please post it in the team chat, not here.
+  Vercel goes the other way: it can only be imported after P1 pushes K1.
 
 ---
 
