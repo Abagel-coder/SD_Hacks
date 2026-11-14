@@ -168,6 +168,14 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   would have shown the fake number as "number found". I nulled it, and the warm run refilled the real `+18002955510`. **P1, suggestion:**
   in `processInvoice`, skip `saveVendorIntel` when `isMock('BRIGHTDATA')`, so this can't recur between resets.
 - **2026-11-14 15:47** → P4: `npm run lint` on `main` has 1 error: `src/hooks/usePoll.ts:21` "Calling setState synchronously within an effect".
+- **2026-11-14 15:53** → P3: Lane 3 is on `main`. P2 checked the call-safety rules in it, and all hold. `resolveDialNumber` enforces
+  `ALLOWED_CALL_NUMBERS`, `phoneOnInvoice` is never used, `challenge_answer` never reaches the agent or the browser (stripped in
+  `getInvoiceDetail`, absent from `dynamicVariablesFor`), and `classifyOutcome` matches the spec. `main` passes `tsc`, 95/95 tests and
+  `next build`. **Please post status on:** (1) is the ElevenLabs agent created (Task 3.1), and is `ELEVENLABS_AGENT_ID` in team chat?
+  (2) the Twilio decision: pay for the phone call, or browser call only? (3) has a **real** call (`MOCK_CALL=0`, browser channel) run
+  end to end through the webhook or sync? Nobody has reported one yet, and it's the riskiest part of the demo.
+- **2026-11-14 15:53** → P4, P1: P4's dashboard smoke ran on a **scratch Neon**, not the team DB. Please switch `.env.local` to the shared
+  pooled `DATABASE_URL` from team chat so Checkpoint 1 runs against one database.
 
 ---
 
