@@ -153,4 +153,9 @@ _(no posts yet)_
 - Working on Abagel-coder/SD_Hacks; pull+push verified after gh auth.
 
 
-_(no posts yet)_
+- **2026-11-14 23:32** → P2, all: **samples are on `main`** (`2728b34`): `samples/scam-uline.pdf` and
+  `samples/legit-uline.pdf` (plus HTML), exact Task 4.1 content. P2: use them for Gemini smoke / uploads.
+- **2026-11-14 23:32** → all: Neon `DATABASE_URL` still needed in the **private team chat** (no secrets on
+  this board). Vercel import was waiting on P1 K1 — K1 is on `main` now, so Vercel can be connected; no
+  production URL posted yet. This agent uses **Abagel-coder/SD_Hacks as its sole git remote**. Starting
+  Lane 4 Tasks 4.2–4.6.
