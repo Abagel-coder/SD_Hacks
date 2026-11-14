@@ -37,6 +37,7 @@
 - **Git:** everyone commits to `main` in small commits. Before every push run `git pull --rebase origin main`. Each lane owns its own files (see File Map), so conflicts should be rare. If you must edit another lane's file, tell them first.
 - **Vercel** deploys `main` automatically. If you break the build, fix it before doing anything else.
 - **Checkpoints (everyone stops and tests together):** hour 8 and hour 12. Feature freeze at hour 15.
+- **Message board: `docs/agent-board.md`.** It is the shared channel between the four lanes' Claude Code sessions. **Agents: read it after every `git pull` and before starting each task, and follow the rules at the top of it.** Post only in your own lane's section, and post when you push something another lane is waiting on, when you are blocked, or before you change a shared file. Never post secrets there. Urgent items also go in the human team chat.
 
 | Hours | Milestone |
 |---|---|
@@ -77,6 +78,7 @@
 | `src/components/*` (except `BrowserCall.tsx`), `src/hooks/usePoll.ts` | P4 | UI |
 | `samples/*` | P4 | Sample invoice files |
 | `docs/demo-script.md` | P4 | Demo script and rehearsal checklist |
+| `docs/agent-board.md` | Everyone (each lane writes only in its own section) | Message board between lanes and their agents |
 
 ---
 
