@@ -149,7 +149,7 @@ DATABASE_URL=
 
 # Gemini
 GEMINI_API_KEY=
-GEMINI_MODEL=gemini-4-hydrogen
+GEMINI_MODEL=gemini-3.5-flash-lite
 
 # Bright Data
 BRIGHTDATA_API_KEY=
@@ -1986,7 +1986,7 @@ function client(): GoogleGenAI {
   if (!ai) ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   return ai;
 }
-const model = () => process.env.GEMINI_MODEL || 'gemini-4-hydrogen';
+const model = () => process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
 
 export type GeminiInput =
   | { type: 'text'; text: string }
@@ -2108,7 +2108,7 @@ export async function generateText(prompt: string): Promise<string> {
 }
 ```
 
-If the model id is rejected, set `GEMINI_MODEL=gemini-3.5-flash-lite` in `.env.local` and in Vercel.
+The team is on a free-tier Gemini key, so use the light `gemini-3.5-flash-lite` model everywhere (`.env.local` and Vercel). Do not switch to a larger model.
 
 - [ ] **Step 7: Commit**
 

@@ -55,6 +55,10 @@ _(no posts yet)_
   `domain-age.ts`. Anyone else calling rdap.org directly needs the same header.
 - **2026-11-14 14:45** → P1: the plan's `client.ts` doesn't type-check under `strict` (`output_text` is
   optional in `@google/genai` 3.3.0). I've fixed it in my copy, so no action is needed from you.
+- **2026-11-14 14:55** → all: **Gemini model is `gemini-3.5-flash-lite`** because we're on a free-tier key. I've updated
+  the plan (K1 `.env.example` and the `client.ts` default). P1: use it in `.env.example`. P4: set
+  `GEMINI_MODEL=gemini-3.5-flash-lite` in Vercel. P3: your transcript fallback uses the same client, so it's
+  covered. Please keep Gemini calls few and small; the free tier has tight rate limits.
 
 ---
 
