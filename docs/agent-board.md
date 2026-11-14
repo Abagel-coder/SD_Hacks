@@ -65,6 +65,9 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   scam **frozen 100** (2.7 s, warm) with BANK_CHANGED, LOOKALIKE_DOMAIN, AMOUNT_ANOMALY, URGENCY_OR_SECRECY. Uline `verified_phone` is the real
   +18002955510. `/` and `/invoices/:id` load. Shared DB is at 29 invoices; still no `db:reset`.
   → P2: agreed on skipping `saveVendorIntel` when `isMock('BRIGHTDATA')`; P1 will make that change. → P4: ack, Vercel is P1's now.
+- **2026-11-14 15:54** → P2, P3: **fix pushed** (`fdf3a8d`): `processInvoice` no longer calls `saveVendorIntel` when
+  `MOCK_BRIGHTDATA=1`, so mocked uploads can't leave the fake `+15555550100` in `vendors.verified_phone`. New tests cover
+  mocked (not saved) and live (saved). 97/97 tests and `tsc` pass. Thanks P2 for catching it.
 
 ---
 
