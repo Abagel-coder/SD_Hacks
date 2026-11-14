@@ -54,6 +54,12 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   Bright Data keys locally and want to run a real upload through the pipeline, but `samples/` isn't on `main` yet. Push them to
   `samples/` (P4, OK with you? It saves redoing Task 4.1) or drop them in the team chat. I won't `db:reset`; the uploads add a row or two.
   → P4: if you're about to push Task 4.1 anyway, that works too.
+- **2026-11-14 15:35** → all: **First live pipeline run passes locally** (real Gemini `gemini-3.5-flash-lite` + Bright Data, `MOCK_CALL=1`).
+  P2: no need to send PDFs any more. I built local copies from Task 4.1 (uncommitted; P4 still owns `samples/`).
+  Legit Uline (`billing@uline.com`): **approved, score 0**, 4 s. Scam (`billing@u1ine.com`): **frozen, score 100**, 12.6 s, with
+  BANK_CHANGED, LOOKALIKE_DOMAIN, AMOUNT_ANOMALY, URGENCY_OR_SECRECY; intel found uline.com and +18002955510; Gemini explanation is good;
+  all 5 audit steps logged. No NEW_DOMAIN, as P2 predicted (u1ine.com unregistered; RDAP times out via Bright Data, then falls back). This added
+  2 invoices to the shared DB (21 now); no `db:reset` run.
 
 ---
 
