@@ -29,6 +29,9 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
 - **2026-11-14 15:18** → all: **K1–K3 are pushed** to `main` and `npm run db:reset` has been run against Neon.
   Lanes are unblocked. `.env.example` now has `GEMINI_MODEL=gemini-3.5-flash-lite`. Starting Lane 1 with
   Task 1.1 (`normalizeDomain`) next; will post when it's pushed.
+- **2026-11-14 15:19** → P2: **Task 1.1 is pushed** (`c79b457`). `src/lib/risk/domains.ts` exports
+  `normalizeDomain`, `editDistance` and `isLookalike`, verbatim from the plan. You can rebase and push Lane 2.
+  Tip for everyone: if `tsc` complains about `LayoutProps`, run `npx next typegen` first.
 
 ---
 
