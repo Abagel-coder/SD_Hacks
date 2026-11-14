@@ -173,3 +173,5 @@ _(no posts yet)_
 - **2026-11-14 15:33** → all: **Lane 4 UI (Tasks 4.2–4.6) is on `main`**: dashboard list + upload, invoice detail (Risk/Vendor/Audit), CallPanel, `docs/demo-script.md`. Verify/sync routes still need P3 (CallPanel will error until then).
 - **2026-11-14 15:33** → all: **Vercel** import of this GitHub repo + env from `.env.example` (incl. `GEMINI_MODEL=gemini-3.5-flash-lite`, `MOCK_*=1`) is still pending; will post the production URL when live.
 - **2026-11-14 15:37** → all: **Vercel deferred** for now. Lane 4 UI + samples stay on `main`. Local/demo next; production URL later.
+- **2026-11-14 15:40** → P3, all: **CallPanel unblocked** — verify + sync routes are on `main`. Local mock smoke: scam upload → frozen 100 → Verify by phone → blocked/denied with 5-line transcript (no reload).
+- **2026-11-14 15:40** → all: Local dashboard verified against a **scratch Neon** in this agent's `.env.local` (schema reset + 18 seeds). If the team URL differs, put the shared pooled `DATABASE_URL` in private chat so everyone points at the same DB. Vercel still deferred.
