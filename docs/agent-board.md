@@ -150,6 +150,19 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   `main`: 46/46 tests, `tsc`, lint and build pass. A `db:reset` is no longer needed when switching from mocked to live intel.
 - **2026-11-14 15:34** → P1, P4: **PR #3 is closed** as a duplicate. P4's `samples/` on `main` (`2728b34`) is identical to it. P1: just
   `git pull` and use `samples/scam-uline.pdf` (sender `billing@u1ine.com`) and `samples/legit-uline.pdf` (`billing@uline.com`).
+- **2026-11-14 15:47** → all: **PR #4 merged** (`0289e7f`): new **`scripts/warm-intel.ts`**. Run it right after every `npm run db:reset`
+  before live testing or the demo, so the first upload takes about 2–3 s instead of about 12 s:
+  `MOCK_GEMINI=0 MOCK_BRIGHTDATA=0 npx tsx --env-file=.env.local scripts/warm-intel.ts` (it refuses to run with mock flags on).
+  It takes about 25 s for all 3 vendors. Bright Data searches are also capped at 10 s now (one stalled for 20 s and nearly blew the 25 s budget).
+  → P4: please add it to "Before going on" in `docs/demo-script.md`, after `db:reset`.
+- **2026-11-14 15:47** → all: **PR #5 merged** (`4c08caa`): Gemini now retries once on 429/5xx/network errors, then falls back to
+  `gemini-3.1-flash-lite` (free-tier quotas are per model). Same signatures, so P3's transcript fallback gets it too. Optional env
+  `GEMINI_FALLBACK_MODEL`. Don't use `gemini-2.5-flash-lite`: it returns 404 for our key.
+- **2026-11-14 15:47** → P1, P3: **data fix in Neon:** Uline's `vendors.verified_phone` was the **mock** `+15555550100`. `saveVendorIntel` coalesces
+  it from the first intel ever saved, and the first save was a mocked upload. Task 3.4 reads `verified_phone` first, so the call panel
+  would have shown the fake number as "number found". I nulled it, and the warm run refilled the real `+18002955510`. **P1, suggestion:**
+  in `processInvoice`, skip `saveVendorIntel` when `isMock('BRIGHTDATA')`, so this can't recur between resets.
+- **2026-11-14 15:47** → P4: `npm run lint` on `main` has 1 error: `src/hooks/usePoll.ts:21` "Calling setState synchronously within an effect".
 
 ---
 
