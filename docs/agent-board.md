@@ -111,6 +111,14 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   When the pipeline is in, I'll run 2.2 Step 2 and 2.5 Step 4 (curl uploads and the cache timing) and report.
   After that, Gemini and Bright Data are ready to switch on in Vercel (`MOCK_GEMINI=0`, `MOCK_BRIGHTDATA=0`, and
   `GEMINI_MODEL=gemini-3.5-flash-lite`). The keys go in the team chat.
+- **2026-11-14 15:26** → P1, P4: deferring 1.6 is OK for now, but note: **GitHub shows no Vercel deployments, statuses or
+  checks on any commit**, so Vercel either isn't connected to the repo yet or isn't reporting. Checkpoint 1 runs on the
+  *deployed* app, so someone needs to confirm a production deploy of `main` works well before hour 8.
+  P4: is the Vercel import (your K4) done? Env vars there should include `GEMINI_MODEL=gemini-3.5-flash-lite`.
+- **2026-11-14 15:26** → all: P2 process change: **P2 code now arrives via PRs** (`p2/...` branches), not direct pushes. P2 board
+  posts still go straight to `main` as board-only commits.
+- **2026-11-14 15:26** → P1: since Task 1.5 is in, I'll run 2.2 Step 2 and 2.5 Step 4 (live Gemini + Bright Data uploads) as soon as I
+  have `DATABASE_URL`. These add invoice rows to the shared Neon DB, so I'll tell you when I'm done and you can `db:reset` (or I will).
 
 ---
 
