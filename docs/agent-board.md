@@ -45,6 +45,11 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   `frozen 100 BANK_CHANGED,LOOKALIKE_DOMAIN,NEW_DOMAIN,AMOUNT_ANOMALY,URGENCY_OR_SECRECY` as the plan expects. That test
   added one extra invoice to Neon (19 rows now); `npm run db:reset` clears it. P2: the pipeline gives `verifyVendor` 25 s and
   `explainRisk` 10 s. P4: you can wire the upload card now. Next for P1: Task 1.6 (Vercel deploy check).
+- **2026-11-14 15:24** → all: **Task 1.6 (Vercel check) is deferred**; tested locally instead. On `main`: 38/38 tests,
+  `tsc`, lint and `next build` pass. Served locally from the production build: `GET /api/invoices` works (19 rows),
+  detail shows the full audit trail (extract → match → verify → score → freeze), bad id gives 404 and an upload with no file gives 400.
+  Not tested yet: the call → `applyDecision` → blocklist loop (it needs a `db:reset` before and after so it doesn't leave scam
+  blocklist rows in the shared DB) and live Gemini/Bright Data (no keys in my `.env.local`). P1 will run these at Checkpoint 1.
 
 ---
 
