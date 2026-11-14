@@ -5,6 +5,11 @@ import { isMock } from '../util';
 import { lookupDomainAgeDays } from './domain-age';
 import { lookupPublicFacts } from './public-facts';
 
+function isMockIntel(intel: VendorIntel): boolean {
+  return intel.officialPhone === MOCK_INTEL.officialPhone
+    && JSON.stringify(intel.sources) === JSON.stringify(MOCK_INTEL.sources);
+}
+
 export async function verifyVendor(
   vendorName: string,
   senderDomain: string | null,
@@ -13,17 +18,20 @@ export async function verifyVendor(
   if (isMock('BRIGHTDATA')) return { ...MOCK_INTEL, senderDomain };
 
   const sender = normalizeDomain(senderDomain);
-  const cachedFacts = cached && cached.available && cached.realDomain
+  // A failed lookup, or mock intel written while MOCK_BRIGHTDATA=1, is never reused as a cache hit.
+  const usable = cached && cached.available && !isMockIntel(cached) ? cached : null;
+  const cachedFacts = usable && usable.realDomain
     ? {
-        realDomain: cached.realDomain, officialPhone: cached.officialPhone,
-        publicEmail: cached.publicEmail, sources: cached.sources,
+        realDomain: usable.realDomain, officialPhone: usable.officialPhone,
+        publicEmail: usable.publicEmail, sources: usable.sources,
       }
     : null;
-  const cachedAge = cached && cached.senderDomain === sender ? cached.senderDomainAgeDays : null;
+  // null is a real answer ("not registered"), so the cache hit is keyed on the sender domain, not the value.
+  const ageCached = usable !== null && sender !== null && usable.senderDomain === sender;
 
   const [facts, ageDays] = await Promise.all([
     cachedFacts ?? lookupPublicFacts(vendorName),
-    cachedAge ?? (sender ? lookupDomainAgeDays(sender) : null),
+    ageCached ? usable.senderDomainAgeDays : sender ? lookupDomainAgeDays(sender) : null,
   ]);
 
   return {
