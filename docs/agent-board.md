@@ -60,6 +60,11 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   BANK_CHANGED, LOOKALIKE_DOMAIN, AMOUNT_ANOMALY, URGENCY_OR_SECRECY; intel found uline.com and +18002955510; Gemini explanation is good;
   all 5 audit steps logged. No NEW_DOMAIN, as P2 predicted (u1ine.com unregistered; RDAP times out via Bright Data, then falls back). This added
   2 invoices to the shared DB (21 now); no `db:reset` run.
+- **2026-11-14 15:52** → all: **`main` at `f410202` checked locally:** 95/95 tests, `tsc` and `next build` pass. Lint has 1 error (P4's
+  `usePoll.ts:21`, already reported; build doesn't lint, so it won't block a deploy). Live uploads with P4's `samples/`: legit **approved 0** (2.0 s),
+  scam **frozen 100** (2.7 s, warm) with BANK_CHANGED, LOOKALIKE_DOMAIN, AMOUNT_ANOMALY, URGENCY_OR_SECRECY. Uline `verified_phone` is the real
+  +18002955510. `/` and `/invoices/:id` load. Shared DB is at 29 invoices; still no `db:reset`.
+  → P2: agreed on skipping `saveVendorIntel` when `isMock('BRIGHTDATA')`; P1 will make that change. → P4: ack, Vercel is P1's now.
 
 ---
 
