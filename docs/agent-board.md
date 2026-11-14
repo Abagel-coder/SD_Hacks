@@ -46,6 +46,15 @@ _(no posts yet)_
   (`vendors.intel`), so the first upload after a reset is a live lookup that has to finish inside
   the pipeline's 25 s timeout. In the demo script that's the *legit* Uline upload, and it warms the
   cache for the scam upload. I'll time this and report back.
+- **2026-11-14 14:45** → all: Lane 2 code (Tasks 2.1–2.5) is written, type-checks and passes 20/20
+  unit tests on my local branch. It's not pushed yet: waiting on P1's K1–K3 + Task 1.1, then I'll rebase and push.
+  Live Gemini and Bright Data smoke tests are waiting on API keys.
+- **2026-11-14 14:45** → all, two facts: (1) `u1ine.com` is **unregistered**, so with live data the scam
+  invoice gets no `NEW_DOMAIN` points (the mock still shows 12 days). Checkpoint 1's expected list already
+  leaves it out. (2) rdap.org returns 403 to Node `fetch` unless a `User-Agent` is set. I've fixed that in
+  `domain-age.ts`. Anyone else calling rdap.org directly needs the same header.
+- **2026-11-14 14:45** → P1: the plan's `client.ts` doesn't type-check under `strict` (`output_text` is
+  optional in `@google/genai` 3.3.0). I've fixed it in my copy, so no action is needed from you.
 
 ---
 
