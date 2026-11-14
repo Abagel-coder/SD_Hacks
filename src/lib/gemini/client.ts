@@ -12,20 +12,20 @@ export type GeminiInput =
   | { type: 'document'; data: string; mime_type: string } // base64 PDF
   | { type: 'image'; data: string; mime_type: string }; // base64 image
 
+// Uses generateContent: the Interactions API's v1 endpoint rejects `document` (PDF) inputs
+// (smoke-tested 2026-11-14), so this is the plan's documented fallback.
 export async function generateJson<T>(input: GeminiInput[], schema: object): Promise<T> {
-  const interaction = await client().interactions.create({
+  const response = await client().models.generateContent({
     model: model(),
-    input,
-    response_format: { type: 'text', mime_type: 'application/json', schema },
+    contents: input.map((part) =>
+      part.type === 'text' ? { text: part.text } : { inlineData: { mimeType: part.mime_type, data: part.data } }),
+    config: { responseMimeType: 'application/json', responseSchema: schema },
   });
-  if (!interaction.output_text) throw new Error('Gemini returned no text output');
-  return JSON.parse(interaction.output_text) as T;
+  if (!response.text) throw new Error('Gemini returned no text output');
+  return JSON.parse(response.text) as T;
 }
 
 export async function generateText(prompt: string): Promise<string> {
-  const interaction = await client().interactions.create({
-    model: model(),
-    input: [{ type: 'text', text: prompt }],
-  });
-  return (interaction.output_text ?? '').trim();
+  const response = await client().models.generateContent({ model: model(), contents: prompt });
+  return (response.text ?? '').trim();
 }
