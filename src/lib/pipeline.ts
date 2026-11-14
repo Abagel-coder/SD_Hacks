@@ -6,7 +6,7 @@ import { findBlocklistHits, findVendorByName, insertInvoice, saveRisk, saveVendo
 import { normalizeDomain } from './risk/domains';
 import { scoreInvoice } from './risk/engine';
 import type { InvoiceRow, InvoiceStatus, RiskResult, VendorIntel } from './types';
-import { withTimeout } from './util';
+import { isMock, withTimeout } from './util';
 
 export function fallbackExplanation(risk: RiskResult): string {
   if (risk.reasons.length === 0) {
@@ -48,7 +48,9 @@ export async function processInvoice(input: {
     console.error('verifyVendor failed', err);
     intel = unavailableIntel(senderDomain);
   }
-  if (vendor && intel.available) await saveVendorIntel(vendor.id, intel);
+  // Never cache mock intel on the vendor: saveVendorIntel coalesces real_domain and verified_phone
+  // from the first save, so a mocked run would leave a fake phone behind for later live runs.
+  if (vendor && intel.available && !isMock('BRIGHTDATA')) await saveVendorIntel(vendor.id, intel);
   await logAudit(invoice.id, 'agent', 'verify_vendor',
     { vendorName: extracted.vendorName, senderDomain }, intel,
     intel.available
