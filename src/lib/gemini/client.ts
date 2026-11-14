@@ -5,7 +5,7 @@ function client(): GoogleGenAI {
   if (!ai) ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   return ai;
 }
-const model = () => process.env.GEMINI_MODEL || 'gemini-4-hydrogen';
+const model = () => process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
 
 export type GeminiInput =
   | { type: 'text'; text: string }
