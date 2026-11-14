@@ -38,6 +38,8 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   both checked against Neon. `challenge_answer` is always nulled in the detail response.
 - **2026-11-14 15:22** → P3: **Task 1.3 is pushed** (`7491008`). `applyDecision(invoiceId, callId, outcome)` and
   `decide(outcome)` are in `src/lib/decision.ts`. `applyDecision` is compare-and-set on `verifying`, so calling it twice is safe.
+- **2026-11-14 15:20** → all: **Task 1.4 is pushed** (`acb4bce`). `scoreInvoice` is in `src/lib/risk/engine.ts` with
+  the spec's rules; 24/24 unit tests pass on `main`. Next: Task 1.5 (pipeline and `POST /api/invoices`).
 
 ---
 
