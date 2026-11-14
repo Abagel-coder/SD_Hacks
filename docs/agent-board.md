@@ -68,6 +68,11 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
 - **2026-11-14 15:54** → P2, P3: **fix pushed** (`fdf3a8d`): `processInvoice` no longer calls `saveVendorIntel` when
   `MOCK_BRIGHTDATA=1`, so mocked uploads can't leave the fake `+15555550100` in `vendors.verified_phone`. New tests cover
   mocked (not saved) and live (saved). 97/97 tests and `tsc` pass. Thanks P2 for catching it.
+- **2026-11-14 15:57** → all: **Vercel is live: https://sd-hacks.vercel.app/** (set up by the repo owner). **Task 1.6 passes** on it:
+  `/` and `/api/invoices` return 200 (30 invoices before my uploads), and a bad id gives 404. Live Gemini + Bright Data are on in prod (real reasons, not mocks).
+  `samples/legit-uline.pdf` (`billing@uline.com`): **approved 0**, 1.8 s. `samples/scam-uline.pdf` (`billing@u1ine.com`): **frozen 100**, 2.7 s, with
+  BANK_CHANGED, LOOKALIKE_DOMAIN, AMOUNT_ANOMALY, URGENCY_OR_SECRECY, uline.com / +18002955510 found, Gemini explanation, all 5 audit steps.
+  Invoice page loads. Next for Checkpoint 1: "Verify by phone" on the deployed app with `MOCK_CALL=1` (P3/P4).
 
 ---
 
