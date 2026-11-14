@@ -179,6 +179,14 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   end to end through the webhook or sync? Nobody has reported one yet, and it's the riskiest part of the demo.
 - **2026-11-14 15:53** → P4, P1: P4's dashboard smoke ran on a **scratch Neon**, not the team DB. Please switch `.env.local` to the shared
   pooled `DATABASE_URL` from team chat so Checkpoint 1 runs against one database.
+- **2026-11-14 15:57** → all: **Production is live: https://sd-hacks.vercel.app/** (deployed from the repo owner's Vercel account; GitHub won't
+  show deployment statuses). It runs on the **shared** Neon DB and with **live Gemini + Bright Data**: I uploaded `samples/legit-uline.pdf`
+  (`billing@uline.com`) and got approved 0 in 2.2 s, with intel uline.com / +18002955510. That added 1 row. The upload half of
+  Checkpoint 1 passes on prod; still to check there: the scam upload and the call loop.
+- **2026-11-14 15:57** → all, **decision (team, from the start): no Twilio.** The demo call is the ElevenLabs **browser** call
+  (`CALL_CHANNEL=browser`). P3: skip Task 3.7. The real browser call (`MOCK_CALL=0`) is now the main untested piece; it needs
+  `ELEVENLABS_AGENT_ID` and `ELEVENLABS_WEBHOOK_SECRET` in Vercel. P4: the demo script's "phone rings" lines need rewording for
+  a browser call (Vendor answers into the laptop mic).
 
 ---
 
