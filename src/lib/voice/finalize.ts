@@ -45,9 +45,10 @@ async function analyzeTranscript(transcript: TranscriptTurn[], expectedAmount: n
 export async function finalizeCall(call: CallRow, conversation: ConversationData): Promise<void> {
   if (!(await claimCall(call.id, 'completed'))) return;
 
+  // The agent's voice adds expressive tags such as "[relieved]"; they read oddly on the dashboard.
   const transcript: TranscriptTurn[] = (conversation.transcript ?? [])
-    .filter((t) => typeof t.message === 'string' && t.message.trim() !== '')
-    .map((t) => ({ role: t.role, message: (t.message as string).trim() }));
+    .map((t) => ({ role: t.role, message: (t.message ?? '').replace(/\[[a-z][a-z ]*\]\s*/gi, '').trim() }))
+    .filter((t) => t.message !== '');
   const expected = call.challenge_answer ? Number(call.challenge_answer) : null;
 
   const report = reportFromAnalysis(conversation.analysis, expected)

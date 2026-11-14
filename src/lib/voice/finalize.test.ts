@@ -44,6 +44,20 @@ describe('finalizeCall', () => {
     expect(m.applyDecision).toHaveBeenLastCalledWith(call.invoice_id, call.id, 'unclear');
   });
 
+  it('strips expressive voice tags and empty turns from the transcript', async () => {
+    await finalizeCall(call, {
+      ...MOCK_CONVERSATION,
+      transcript: [
+        { role: 'agent', message: '[relieved] Thank you for confirming that.' },
+        { role: 'agent', message: null },
+        { role: 'agent', message: '[concerned] ' },
+      ],
+    });
+    expect(m.updateCall.mock.calls[0][1].transcript).toEqual([
+      { role: 'agent', message: 'Thank you for confirming that.' },
+    ]);
+  });
+
   it('does nothing when another request already finished the call', async () => {
     m.claimCall.mockResolvedValue(false);
     await finalizeCall(call, MOCK_CONVERSATION);
