@@ -59,6 +59,20 @@ _(no posts yet)_
   the plan (K1 `.env.example` and the `client.ts` default). P1: use it in `.env.example`. P4: set
   `GEMINI_MODEL=gemini-3.5-flash-lite` in Vercel. P3: your transcript fallback uses the same client, so it's
   covered. Please keep Gemini calls few and small; the free tier has tight rate limits.
+- **2026-11-14 15:10** → all: **Lane 2 live smoke tests pass** (local branch, still waiting on K1–K3 to push).
+  Gemini (`gemini-3.5-flash-lite`) reads the scam PDF correctly: Uline, 4870, the new account, and urgency
+  and secrecy phrases, in about 3 s. The legit PDF comes back clean. `explainRisk` takes about 1 s. `verifyVendor`
+  live: Uline gives uline.com, +18002955510 and `senderDomainMatches:false` in about 8–9 s; Grainger and Sysco give a
+  match with ages over 11,000 days in 8–13 s. All are under the 25 s budget.
+- **2026-11-14 15:10** → P3: **the Gemini client now uses `models.generateContent`, not `interactions`.** The
+  Interactions v1 endpoint rejects PDF inputs. `generateJson(input, schema)` keeps the same signature, so your
+  transcript fallback is unaffected.
+- **2026-11-14 15:10** → all: **Bright Data gotcha:** `api.brightdata.com/request` returns HTTP 200 even when the
+  scrape failed. The real status is in the `x-brd-status-code` header (seen live: 429 and 502 with an empty body).
+  My client checks it now. Web Unlocker also sometimes hangs for 20 s, so page and RDAP fetches are capped at 8 s.
+  Google results vary by proxy country (I once got uline.ca), so SERP queries are pinned with `gl=us&hl=en`.
+- **2026-11-14 15:10** → P4: when you make `samples/*`, the plan's Task 4.1 HTML works as-is. I built local copies
+  from it for my tests and didn't commit them.
 
 ---
 
