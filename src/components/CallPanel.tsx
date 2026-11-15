@@ -24,8 +24,6 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
   const callId = call?.id ?? null;
   const blocklisted = (invoice.risk_reasons ?? []).some((reason) => reason.code === 'BLOCKLIST_HIT');
 
-  // While verifying, ask the server to sync the call. This drives live status and
-  // completes the call even if the webhook is late.
   useEffect(() => {
     if (!verifying || !callId) return;
     const timer = setInterval(() => {
@@ -57,17 +55,17 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
 
   return (
     <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
-      <h2 className="font-semibold">Vendor verification</h2>
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Vendor verification</h2>
 
       {invoice.status === 'frozen' && blocklisted && (
-        <p className="mt-2 text-sm font-medium text-red-800">
+        <p className="mt-3 text-sm font-medium text-red-800">
           Already denied by vendor, blocked automatically.
         </p>
       )}
 
       {invoice.status === 'frozen' && !blocklisted && (
-        <div className="mt-2 space-y-2">
-          <p className="text-sm text-gray-700">
+        <div className="mt-3 space-y-2">
+          <p className="text-sm leading-relaxed text-gray-700">
             The agent verifies with the vendor over a browser call, using the publicly listed number for context — never the one printed on the invoice.
           </p>
           <div className="flex flex-wrap gap-2">
@@ -83,12 +81,12 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
       )}
 
       {invoice.status === 'blocked' && blocklisted && !call && (
-        <p className="mt-2 text-sm font-medium text-red-800">
+        <p className="mt-3 text-sm font-medium text-red-800">
           Already denied by vendor, blocked automatically.
         </p>
       )}
 
-      {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
 
       {call && verifying && (
         <div className="mt-3 space-y-2">
@@ -120,18 +118,37 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
       )}
 
       {call?.transcript && call.transcript.length > 0 && (
-        <ol className="mt-3 space-y-2 text-sm">
-          {call.transcript.map((turn, index) => (
-            <li key={index} className={turn.role === 'agent' ? 'text-gray-700' : 'font-medium text-gray-900'}>
-              <span className="mr-2 text-xs uppercase text-gray-500">{turn.role === 'agent' ? 'Agent' : 'Vendor'}</span>
-              {turn.message}
-            </li>
-          ))}
-        </ol>
+        <div className="mt-4 space-y-2">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Call transcript</h3>
+          <ol className="max-h-80 space-y-2 overflow-y-auto rounded-lg border border-gray-100 bg-gray-50 p-3">
+            {call.transcript.map((turn, index) => {
+              const agent = turn.role === 'agent';
+              return (
+                <li
+                  key={index}
+                  className={`flex ${agent ? 'justify-start' : 'justify-end'}`}
+                >
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm ${
+                      agent
+                        ? 'rounded-bl-md bg-white text-gray-800 ring-1 ring-gray-200'
+                        : 'rounded-br-md bg-blue-700 text-white'
+                    }`}
+                  >
+                    <p className={`mb-0.5 text-[10px] font-semibold uppercase tracking-wide ${agent ? 'text-gray-500' : 'text-blue-100'}`}>
+                      {agent ? 'Agent' : 'Vendor'}
+                    </p>
+                    <p>{turn.message}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
       )}
 
-      {!call && invoice.status !== 'frozen' && (
-        <p className="mt-2 text-sm text-gray-600">No call was needed for this invoice.</p>
+      {!call && invoice.status !== 'frozen' && !blocklisted && (
+        <p className="mt-3 text-sm text-gray-600">No call was needed for this invoice.</p>
       )}
     </section>
   );

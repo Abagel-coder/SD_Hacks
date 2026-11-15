@@ -20,8 +20,8 @@ function Row({ label, value }: { label: string; value: string }) {
 export function VendorCheck({ invoice }: { invoice: InvoiceRow }) {
   const intel = invoice.intel;
   return (
-    <section className="rounded-lg border bg-white p-4">
-      <h2 className="font-semibold">Public web check</h2>
+    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Public web check</h2>
       <p className="text-xs text-gray-500">Looked up live with Bright Data</p>
       {!intel || !intel.available ? (
         <p className="mt-2 text-sm text-gray-600">The public web check was unavailable for this invoice.</p>

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { AlertBanner } from '@/components/AlertBanner';
+import { AppNav } from '@/components/AppNav';
 import { StatusBadge } from '@/components/StatusBadge';
 import { UploadCard } from '@/components/UploadCard';
 import { usePoll } from '@/hooks/usePoll';
@@ -15,8 +16,10 @@ export default function Dashboard() {
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 p-6 text-gray-900">
+      <AppNav current="invoices" />
+
       <header>
-        <h1 className="text-2xl font-bold">Invoice Guard</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Invoices</h1>
         <p className="text-sm text-gray-600">
           Every invoice is checked against vendor history and the public web before it is paid.
         </p>

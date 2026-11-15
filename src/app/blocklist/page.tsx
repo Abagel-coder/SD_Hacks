@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { AppNav } from '@/components/AppNav';
 import { usePoll } from '@/hooks/usePoll';
 import { displayBlockedValue, type BlocklistSummary } from '@/lib/blocklist';
 import { clock, money } from '@/lib/format';
@@ -28,14 +29,13 @@ export default function BlocklistPage() {
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 p-6 text-gray-900">
+      <AppNav current="blocklist" />
+
       <header className="space-y-1">
-        <Link href="/" className="text-sm text-gray-600 hover:underline">
-          ← All invoices
-        </Link>
-        <h1 className="text-2xl font-bold">Blocklist</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Blocklist</h1>
         <p className="text-sm text-gray-600">
-          Bank accounts and domains from invoices the vendor denied by phone. Any new invoice that uses
-          one of them is frozen automatically.
+          Bank accounts and domains from invoices the vendor denied. Any new invoice that uses one of
+          them is frozen automatically.
         </p>
       </header>
 

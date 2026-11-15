@@ -3,8 +3,8 @@ import type { AuditRow } from '@/lib/types';
 
 export function AuditLog({ rows }: { rows: AuditRow[] }) {
   return (
-    <section className="rounded-lg border bg-white p-4">
-      <h2 className="font-semibold">Audit log</h2>
+    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Audit log</h2>
       <ol className="mt-2 space-y-2 text-sm">
         {rows.map((row) => (
           <li key={row.id}>

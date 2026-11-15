@@ -1,17 +1,30 @@
 import type { InvoiceStatus } from '@/lib/types';
 
 const STYLES: Record<InvoiceStatus, { label: string; className: string }> = {
-  pending: { label: 'Pending', className: 'bg-gray-100 text-gray-700' },
-  frozen: { label: 'Frozen', className: 'bg-amber-100 text-amber-800' },
-  verifying: { label: 'Verifying by phone', className: 'bg-blue-100 text-blue-800 animate-pulse' },
-  approved: { label: 'Approved', className: 'bg-green-100 text-green-800' },
-  blocked: { label: 'Blocked', className: 'bg-red-600 text-white' },
+  pending: { label: 'Pending', className: 'bg-gray-100 text-gray-800 ring-gray-200' },
+  frozen: { label: 'Frozen', className: 'bg-amber-400 text-amber-950 ring-amber-500' },
+  verifying: { label: 'Verifying…', className: 'bg-blue-600 text-white ring-blue-700 animate-pulse' },
+  approved: { label: 'Approved', className: 'bg-green-100 text-green-900 ring-green-200' },
+  blocked: { label: 'Blocked', className: 'bg-red-600 text-white ring-red-700 shadow-lg shadow-red-200' },
 };
 
-export function StatusBadge({ status }: { status: InvoiceStatus }) {
+const SIZES = {
+  sm: 'px-2.5 py-0.5 text-xs',
+  lg: 'px-5 py-2.5 text-base tracking-wide',
+} as const;
+
+export function StatusBadge({
+  status,
+  size = 'sm',
+}: {
+  status: InvoiceStatus;
+  size?: keyof typeof SIZES;
+}) {
   const style = STYLES[status];
   return (
-    <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${style.className}`}>
+    <span
+      className={`inline-flex items-center rounded-full font-bold uppercase ring-2 ring-inset transition-colors duration-500 ${SIZES[size]} ${style.className}`}
+    >
       {style.label}
     </span>
   );
