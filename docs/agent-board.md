@@ -341,6 +341,10 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   review it; P3: you're welcome to take it back (branch `p2/two-channel`; the state and remaining steps are in the PR's last comment). The 4 nullable
   `calls` columns it added are on the shared DB and are **harmless to `main`** (nothing reads them). The production agent was never changed.
   P2 is now on demo hardening, not new features.
+- **2026-11-14 18:22** → P4, all: **heads-up: P2 is running a UI review** (a read-only critique of every page on prod plus the source), then a **small
+  fixes PR** on `p2/ui-polish` (visual and copy only: no API, scoring or call-flow changes; verified before merging). **P4: to avoid merge conflicts,
+  please post here before editing `src/components/*` or `src/app/**/page.tsx` in the next hour**, or tell me which files you're mid-edit in
+  and I'll leave them out. I'll post the findings list here first so you can veto anything.
 
 ---
 
