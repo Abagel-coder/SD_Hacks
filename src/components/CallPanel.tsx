@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { BrowserCall } from '@/components/BrowserCall';
-import { LiveCallIndicator } from '@/components/LiveCallIndicator';
 import type { CallOutcome, CallRow, InvoiceDetail } from '@/lib/types';
 
 const OUTCOME_TEXT: Record<CallOutcome, string> = {
@@ -62,8 +61,8 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
   }
 
   return (
-    <section className="card text-gray-900">
-      <h2 className="card-title">Vendor verification</h2>
+    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Vendor verification</h2>
 
       {invoice.status === 'frozen' && blocklisted && (
         <p className="mt-3 text-sm font-medium text-amber-950">
@@ -78,7 +77,7 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
           </p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => void verifyInBrowser()} disabled={busy}
-              className="btn-primary">
+              className="rounded bg-blue-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
               {busy ? 'Starting…' : 'Verify in browser'}
             </button>
           </div>
@@ -98,11 +97,10 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
 
       {call && verifying && (
         <div className="mt-3 space-y-2">
-          {call.channel === 'browser' && call.status === 'initiated' ? (
-            <p className="text-sm font-medium text-blue-800">{liveStatus(call)}</p>
-          ) : (
-            <LiveCallIndicator startedAt={call.started_at} label={liveStatus(call)} />
-          )}
+          <p className="flex items-center gap-2 text-sm font-medium text-blue-800">
+            <span className="h-2 w-2 animate-ping rounded-full bg-blue-600" />
+            {liveStatus(call)}
+          </p>
           {call.channel === 'browser' && <BrowserCall callId={call.id} />}
         </div>
       )}
@@ -165,10 +163,10 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
                     className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm ${
                       agent
                         ? 'rounded-bl-md bg-white text-gray-800 ring-1 ring-gray-200'
-                        : 'rounded-br-md bg-accent text-white'
+                        : 'rounded-br-md bg-blue-700 text-white'
                     }`}
                   >
-                    <p className={`mb-0.5 text-xs font-semibold uppercase tracking-wide ${agent ? 'text-gray-500' : 'text-white/75'}`}>
+                    <p className={`mb-0.5 text-xs font-semibold uppercase tracking-wide ${agent ? 'text-gray-500' : 'text-blue-100'}`}>
                       {agent ? 'Agent' : 'Vendor'}
                     </p>
                     <p>{turn.message}</p>

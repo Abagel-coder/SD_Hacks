@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { maskLongNumbers } from '@/lib/format';
-import { RiskIcon } from '@/components/icons';
 import { REASON_TITLE } from '@/lib/risk-labels';
 import type { InvoiceRow } from '@/lib/types';
 
@@ -42,7 +41,7 @@ function Explanation({ text }: { text: string }) {
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="mt-1 text-xs font-semibold text-accent underline underline-offset-2"
+          className="mt-1 text-xs font-semibold text-blue-700 underline underline-offset-2"
         >
           {open ? 'Show less' : 'Show more'}
         </button>
@@ -59,10 +58,10 @@ export function RiskPanel({ invoice }: { invoice: InvoiceRow }) {
   const capped = reasons.reduce((sum, reason) => sum + reason.points, 0) > 100;
 
   return (
-    <section className="card text-gray-900">
+    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="card-title">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">
             {decided ? 'Risk score at upload' : 'Risk score'}
           </h2>
           <p className={`mt-1 text-4xl font-bold tabular-nums ${tone.text}`}>
@@ -94,19 +93,14 @@ export function RiskPanel({ invoice }: { invoice: InvoiceRow }) {
       {reasons.length > 0 ? (
         <ul className="mt-4 space-y-3">
           {reasons.map((reason, index) => (
-            <li key={`${reason.code}-${index}`} className="flex gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3">
-              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-700">
-                <RiskIcon code={reason.code} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline justify-between gap-3">
-                  <p className="text-sm font-semibold text-gray-900">
-                    {REASON_TITLE[reason.code] ?? reason.code.replaceAll('_', ' ')}
-                  </p>
-                  <span className="shrink-0 text-sm font-bold tabular-nums text-red-700">+{reason.points}</span>
-                </div>
-                <p className="mt-1 text-sm leading-relaxed text-gray-700">{maskLongNumbers(reason.detail)}</p>
+            <li key={`${reason.code}-${index}`} className="rounded-md border border-gray-100 bg-gray-50 p-3">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-sm font-semibold text-gray-900">
+                  {REASON_TITLE[reason.code] ?? reason.code.replaceAll('_', ' ')}
+                </p>
+                <span className="shrink-0 text-sm font-bold tabular-nums text-red-700">+{reason.points}</span>
               </div>
+              <p className="mt-1 text-sm leading-relaxed text-gray-700">{maskLongNumbers(reason.detail)}</p>
             </li>
           ))}
         </ul>

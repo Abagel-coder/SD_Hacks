@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { AlertBanner } from '@/components/AlertBanner';
 import { AppNav } from '@/components/AppNav';
-import { StatsStrip } from '@/components/StatsStrip';
 import { StatusBadge } from '@/components/StatusBadge';
 import { UploadCard } from '@/components/UploadCard';
 import { usePoll } from '@/hooks/usePoll';
@@ -34,7 +33,6 @@ export default function Dashboard() {
         </p>
       </header>
 
-      <StatsStrip invoices={invoices} loading={!data} />
       <AlertBanner invoices={invoices} />
       <UploadCard onUploaded={refresh} />
 
@@ -45,7 +43,7 @@ export default function Dashboard() {
           No invoices yet. Upload one to check it.
         </p>
       ) : (
-        <div className="card overflow-x-auto px-3 py-2">
+        <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-gray-200 text-xs uppercase text-gray-500">
               <tr className="*:whitespace-nowrap *:px-2 *:py-2">

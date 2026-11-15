@@ -22,8 +22,8 @@ const KIND_LABEL: Record<BlocklistKind, string> = {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="card">
-      <p className="card-title">{label}</p>
+    <div className="rounded-lg border border-gray-200 bg-white p-4">
+      <p className="text-xs uppercase tracking-wide text-gray-600">{label}</p>
       <p className="mt-1 text-2xl font-bold tabular-nums text-gray-900">{value}</p>
     </div>
   );
@@ -60,7 +60,7 @@ export default function BlocklistPage() {
           domain land here.
         </p>
       ) : (
-        <div className="card overflow-x-auto px-3 py-2">
+        <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-gray-200 text-xs uppercase text-gray-500">
               <tr className="*:whitespace-nowrap *:px-2 *:py-2">
