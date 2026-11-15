@@ -116,7 +116,7 @@ export async function processInvoice(input: {
   await logAudit(invoice.id, 'agent', status === 'frozen' ? 'freeze_payment' : 'approve_payment',
     { score: risk.score }, { status },
     status === 'frozen'
-      ? 'Payment frozen until the vendor is verified by phone.'
+      ? 'Payment frozen until the vendor is confirmed by a verification call.'
       : 'No blocking risk signals. Payment approved.');
   return saved;
 }

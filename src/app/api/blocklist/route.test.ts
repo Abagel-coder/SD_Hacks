@@ -4,7 +4,7 @@ import type { BlocklistSummary } from '@/lib/blocklist';
 const summary: BlocklistSummary = {
   stats: { blockedInvoices: 1, amountStopped: 4870, blocklistEntries: 2 },
   entries: [{
-    id: 'b1', kind: 'domain', value: 'u1ine.com', reason: 'Vendor denied this bank change by phone',
+    id: 'b1', kind: 'domain', value: 'u1ine.com', reason: 'Vendor denied this bank change by a verification call',
     sourceInvoiceId: 'i1', createdAt: '2026-11-14T16:26:00Z', vendorName: 'Uline', amount: 4870,
   }],
 };

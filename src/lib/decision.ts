@@ -33,11 +33,11 @@ export async function applyDecision(
     await updateVendorBank(vendor.id, invoice.bank_account, invoice.bank_routing);
     await logAudit(invoiceId, 'agent', 'save_bank_details',
       { vendorId: vendor.id, callId }, { bankAccountLast4: invoice.bank_account.slice(-4) },
-      `${vendor.name} confirmed the change by phone, so the new bank details were saved.`);
+      `${vendor.name} confirmed the change by a verification call, so the new bank details were saved.`);
   }
 
   if (decision.blocklist) {
-    const reason = `Vendor ${outcome === 'denied' ? 'denied' : 'could not confirm'} this bank change by phone`;
+    const reason = `Vendor ${outcome === 'denied' ? 'denied' : 'could not confirm'} this bank change by a verification call`;
     if (invoice.bank_account) {
       await addToBlocklist('bank_account', invoice.bank_account, reason, invoiceId);
     }

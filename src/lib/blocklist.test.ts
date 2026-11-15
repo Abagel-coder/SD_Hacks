@@ -17,11 +17,11 @@ describe('toBlocklistSummary', () => {
 
   it('maps entry rows and coerces the source invoice amount', () => {
     const s = toBlocklistSummary({ blocked_count: 1, blocked_total: 4870, entry_count: 1 }, [{
-      id: 'b1', kind: 'domain', value: 'u1ine.com', reason: 'Vendor denied this bank change by phone',
+      id: 'b1', kind: 'domain', value: 'u1ine.com', reason: 'Vendor denied this bank change by a verification call',
       source_invoice_id: 'i1', created_at: '2026-11-14T16:26:00Z', vendor_name: 'Uline', amount: '4870',
     }]);
     expect(s.entries).toEqual([{
-      id: 'b1', kind: 'domain', value: 'u1ine.com', reason: 'Vendor denied this bank change by phone',
+      id: 'b1', kind: 'domain', value: 'u1ine.com', reason: 'Vendor denied this bank change by a verification call',
       sourceInvoiceId: 'i1', createdAt: '2026-11-14T16:26:00Z', vendorName: 'Uline', amount: 4870,
     }]);
   });
