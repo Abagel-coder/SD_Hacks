@@ -14,7 +14,7 @@ export function CountUp({ value, format = String }: { value: number; format?: (n
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / 1200);
       const eased = 1 - Math.pow(1 - t, 3);
-      setShown(origin + (value - origin) * eased);
+      setShown(t < 1 ? origin + (value - origin) * eased : value);
       if (t < 1) frame = requestAnimationFrame(tick);
       else from.current = value;
     };
@@ -22,5 +22,6 @@ export function CountUp({ value, format = String }: { value: number; format?: (n
     return () => cancelAnimationFrame(frame);
   }, [value]);
 
-  return <>{format(Math.round(shown))}</>;
+  // Whole numbers while counting; the exact value (cents included) once it lands.
+  return <>{format(shown === value ? value : Math.round(shown))}</>;
 }

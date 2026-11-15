@@ -1,8 +1,13 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
 import { money } from '@/lib/format';
 import type { InvoiceRow } from '@/lib/types';
 
 const MAX_LINES = 3;
+/** Only recent blocks raise the alert, so older history (e.g. the seeded sample scams) stays quiet. */
+const RECENT_MS = 24 * 60 * 60 * 1000;
 
 /** Identical blocked alerts (same vendor and amount) collapse into one line with a count, latest first. */
 function groupAlerts(blocked: InvoiceRow[]): { latest: InvoiceRow; count: number }[] {
@@ -17,8 +22,17 @@ function groupAlerts(blocked: InvoiceRow[]): { latest: InvoiceRow; count: number
   return [...groups.values()].slice(0, MAX_LINES);
 }
 
+/** Blocked invoices whose block happened in the last 24 hours before `now`. */
+export function recentlyBlocked(invoices: InvoiceRow[], now: number): InvoiceRow[] {
+  return invoices.filter(
+    (invoice) => invoice.status === 'blocked' && now - new Date(invoice.updated_at).getTime() < RECENT_MS,
+  );
+}
+
 export function AlertBanner({ invoices }: { invoices: InvoiceRow[] }) {
-  const blocked = invoices.filter((invoice) => invoice.status === 'blocked');
+  // Page-load time is precise enough for a 24-hour window.
+  const [now] = useState(() => Date.now());
+  const blocked = recentlyBlocked(invoices, now);
   if (blocked.length === 0) return null;
   return (
     <div role="alert" className="flex gap-4 rounded-[1.25rem] bg-red-600 p-5 text-sm text-white shadow-lg shadow-red-600/20">
