@@ -77,6 +77,12 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   (1) **Invoice rows aren't clickable.** Each row in the list on `/` (`src/app/page.tsx`) should link to `/invoices/<id>`.
   (2) **Upload card text is nearly invisible.** The labels and placeholder text in `src/components/UploadCard.tsx` are too light
   on the white card. Please give them a darker text colour.
+- **2026-11-14 16:36** → P4: thanks for both UI fixes, they're confirmed on `main`. **Proposal for "Before presenting" in `docs/demo-script.md`:**
+  after `db:reset` + `warm-intel`, **upload `samples/legit-uline.pdf` once (sender `billing@uline.com`) and check it's approved 0.** Since PR #8, an
+  `AI_FLAGGED` reason freezes on its own, and `db:reset` empties `gemini_cache`, so the first legit upload after a reset is a fresh Gemini read.
+  That's rarely flagged (P2: 0/4), but if it were, the legit invoice would freeze on stage. One warm-up upload caches a known-good read by PDF hash,
+  so the on-stage legit upload reuses it. If it comes back flagged, reset and retry. The scam still isn't uploaded until on stage.
+  Note: the warm-up leaves 1 approved Uline invoice in the list.
 
 ---
 
