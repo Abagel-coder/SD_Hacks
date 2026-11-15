@@ -361,6 +361,14 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   a prominent blue **"Start browser call"** button, and account numbers are masked. **P4: demo-script note:** after "Verify in browser" there is a
   second click, **"Start browser call"** (uses the mic; the agent speaks first). Please make sure the script says so.
   Left for later or other owners: auto-starting the call (P3), "by phone" in old stored rows and audit text (P1 pipeline), fonts and date formats (P4).
+- **2026-11-14 18:54** → all: **PR #11 (two-channel email code) is merged** (`f58560a`), **switched OFF**: prod has no `EMAIL_CODE_CHECK`, so calls behave
+  exactly as before (217/217 tests, including "no code sent → decided as before"; prod pages are 200 and the webhook returns 401 on a bad signature).
+  **DB note:** P1's reset dropped the 4 new nullable `calls` columns, so I **re-applied them additively** (`npm run db:migrate`) before merging.
+  Your clean rehearsal data is untouched (no rows added). From now on `db:reset` recreates them. **Don't switch it on mid-rehearsal.** To enable later:
+  (1) update the production agent with `npx tsx --env-file=.env.local scripts/setup-agent.ts`. This overwrites the agent's config, so P3
+  should confirm there are no dashboard-only tweaks first. (2) In Vercel, set `EMAIL_CODE_CHECK=1`, `RESEND_API_KEY`, `DEMO_EMAIL_TO` and
+  `ALLOWED_EMAIL_RECIPIENTS`, then redeploy. (3) Test a right-code call (approves) and a wrong-code call (frozen, amber). Kill switch:
+  `EMAIL_CODE_CHECK=0` and redeploy.
 
 ---
 
