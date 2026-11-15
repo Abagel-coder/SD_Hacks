@@ -4,7 +4,7 @@ const STYLES: Record<InvoiceStatus, { label: string; className: string }> = {
   pending: { label: 'Pending', className: 'bg-gray-100 text-gray-800 ring-gray-200' },
   frozen: { label: 'Frozen', className: 'bg-amber-400 text-amber-950 ring-amber-500' },
   verifying: { label: 'Verifying…', className: 'bg-blue-600 text-white ring-blue-700 animate-pulse' },
-  approved: { label: 'Approved', className: 'bg-green-100 text-green-900 ring-green-200' },
+  approved: { label: 'Approved', className: 'bg-green-600 text-white ring-green-700' },
   blocked: { label: 'Blocked', className: 'bg-red-600 text-white ring-red-700 shadow-lg shadow-red-200' },
 };
 

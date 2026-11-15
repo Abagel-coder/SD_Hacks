@@ -1,3 +1,4 @@
+import { formatPhone } from '@/lib/format';
 import type { InvoiceRow } from '@/lib/types';
 
 function hostOf(url: string): string {
@@ -8,9 +9,26 @@ function hostOf(url: string): string {
   }
 }
 
+/** One link per hostname, in the order found. */
+function uniqueByHost(urls: string[]): { host: string; url: string }[] {
+  const seen = new Map<string, string>();
+  for (const url of urls) {
+    const host = hostOf(url);
+    if (!seen.has(host)) seen.set(host, url);
+  }
+  return [...seen].map(([host, url]) => ({ host, url }));
+}
+
+/** 11305 -> '31 years'; under a year stays in days. */
+function domainAge(days: number): string {
+  if (days < 365) return `${days} days`;
+  const years = Math.round(days / 365.25);
+  return `${years} ${years === 1 ? 'year' : 'years'}`;
+}
+
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between gap-4 border-b py-1 last:border-b-0">
+    <div className="flex justify-between gap-4 border-b border-gray-200 py-1 last:border-b-0">
       <dt className="text-gray-600">{label}</dt>
       <dd className="text-right font-medium">{value}</dd>
     </div>
@@ -19,10 +37,16 @@ function Row({ label, value }: { label: string; value: string }) {
 
 export function VendorCheck({ invoice }: { invoice: InvoiceRow }) {
   const intel = invoice.intel;
+  const phoneOnInvoice = invoice.extracted?.phoneOnInvoice;
+  const sources = intel ? uniqueByHost(intel.sources).slice(0, 3) : [];
   return (
     <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Public web check</h2>
-      <p className="text-xs text-gray-500">Looked up live with Bright Data</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Public web check</h2>
+        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+          Looked up live with Bright Data
+        </span>
+      </div>
       {!intel || !intel.available ? (
         <p className="mt-2 text-sm text-gray-600">The public web check was unavailable for this invoice.</p>
       ) : (
@@ -33,21 +57,21 @@ export function VendorCheck({ invoice }: { invoice: InvoiceRow }) {
             <Row label="Sender matches real website"
               value={intel.senderDomainMatches === null ? 'unknown' : intel.senderDomainMatches ? 'Yes' : 'No'} />
             <Row label="Sender domain age"
-              value={intel.senderDomainAgeDays === null ? 'no registration record' : `${intel.senderDomainAgeDays} days`} />
+              value={intel.senderDomainAgeDays === null ? 'no registration record' : domainAge(intel.senderDomainAgeDays)} />
             {intel.senderWebPresence && (
               <Row label="Sender domain on the web"
                 value={`mentioned in ${intel.senderWebPresence.mentions} of ${intel.senderWebPresence.results} search results`} />
             )}
-            <Row label="Official phone" value={intel.officialPhone ?? 'not found'} />
+            <Row label="Official phone" value={intel.officialPhone ? formatPhone(intel.officialPhone) : 'not found'} />
             <Row label="Public contact email" value={intel.publicEmail ?? 'not found'} />
-            <Row label="Phone printed on invoice" value={invoice.extracted?.phoneOnInvoice ?? 'none'} />
+            <Row label="Phone printed on invoice" value={phoneOnInvoice ? formatPhone(phoneOnInvoice) : 'none'} />
           </dl>
-          {intel.sources.length > 0 && (
+          {sources.length > 0 && (
             <p className="mt-2 truncate text-xs text-gray-500">
               Sources:{' '}
-              {intel.sources.slice(0, 3).map((source, index) => (
-                <a key={source} href={source} target="_blank" rel="noreferrer" className="underline">
-                  {index > 0 ? ', ' : ''}{hostOf(source)}
+              {sources.map((source, index) => (
+                <a key={source.host} href={source.url} target="_blank" rel="noreferrer" className="underline">
+                  {index > 0 ? ', ' : ''}{source.host}
                 </a>
               ))}
             </p>
