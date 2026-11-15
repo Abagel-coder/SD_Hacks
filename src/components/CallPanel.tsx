@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { blockedItemsText } from '@/lib/blocklist';
 import type { CallOutcome, InvoiceDetail } from '@/lib/types';
 
 const OUTCOME_TEXT: Record<CallOutcome, string> = {
@@ -238,7 +239,7 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
               {invoice.status === 'approved'
                 ? 'Payment approved. You can pay this invoice.'
                 : invoice.status === 'blocked'
-                  ? 'Payment blocked, and the account is on the shared blocklist.'
+                  ? blockedNote(detail)
                   : 'Payment stays frozen for you to review.'}
             </p>
           </div>
@@ -283,4 +284,10 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
       )}
     </section>
   );
+}
+
+/** "Payment blocked. The sender domain u1ine.com is now on the shared blocklist." Only names what was really added. */
+function blockedNote({ invoice, vendor }: InvoiceDetail): string {
+  const items = blockedItemsText(invoice.bank_account, invoice.sender_domain, vendor?.real_domain ?? invoice.intel?.realDomain);
+  return items ? `Payment blocked. ${items.charAt(0).toUpperCase()}${items.slice(1)}.` : 'Payment blocked.';
 }

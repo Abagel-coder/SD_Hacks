@@ -51,7 +51,7 @@ export const MOCK_CONVERSATION: ConversationData = {
   transcript: [
     { role: 'agent', message: 'Hi, this is an automated verification call on behalf of Harbor Coffee Roasters. Am I speaking with someone at Uline who can help with a quick billing question?' },
     { role: 'user', message: 'Yes, this is accounts receivable.' },
-    { role: 'agent', message: 'Did Uline recently change its bank account for payments to one ending in 6 7 8 9?' },
+    { role: 'agent', message: 'Did Uline recently switch its payments to a new bank account ending in 6 7 8 9?' },
     { role: 'user', message: 'No. We never changed banks.' },
     { role: 'agent', message: 'Thank you. The payment will be held and Harbor Coffee Roasters will follow up. Goodbye.' },
   ],

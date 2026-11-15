@@ -9,6 +9,7 @@ import { RiskPanel } from '@/components/RiskPanel';
 import { StatusBadge } from '@/components/StatusBadge';
 import { VendorCheck } from '@/components/VendorCheck';
 import { usePoll } from '@/hooks/usePoll';
+import { blockedItemsText } from '@/lib/blocklist';
 import { money } from '@/lib/format';
 import type { InvoiceDetail, InvoiceStatus } from '@/lib/types';
 
@@ -105,6 +106,9 @@ export default function InvoicePage() {
   const call = data.call;
   const shell = STATUS_SHELL[invoice.status] ?? 'bg-white ring-black/5';
   const blocklisted = (invoice.risk_reasons ?? []).some((reason) => reason.code === 'BLOCKLIST_HIT');
+  const blockedItems = blockedItemsText(
+    invoice.bank_account, invoice.sender_domain, vendor?.real_domain ?? invoice.intel?.realDomain,
+  );
   const hasReasons = (invoice.risk_reasons ?? []).length > 0;
   const tabLabel: Record<Tab, string> = {
     risk: `Why it's risky${hasReasons ? ` · ${(invoice.risk_reasons ?? []).length}` : ''}`,
@@ -140,8 +144,7 @@ export default function InvoicePage() {
 
         {invoice.status === 'blocked' && (
           <p role="alert" className="mt-4 text-sm font-semibold text-red-900">
-            Payment blocked. The vendor did not confirm this bank change, and the account ending{' '}
-            {invoice.bank_account?.slice(-4) ?? 'unknown'} is now on the shared blocklist.
+            Payment blocked. The vendor did not confirm this bank change{blockedItems ? `, and ${blockedItems}.` : '.'}
           </p>
         )}
         {invoice.status === 'frozen' && (

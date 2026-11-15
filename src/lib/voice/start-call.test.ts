@@ -51,6 +51,13 @@ describe('dynamicVariablesFor', () => {
     const vars = dynamicVariablesFor(invoice, call);
     expect(vars).toMatchObject({ vendor_name: 'Uline', bank_last4: '6 7 8 9', call_id: call.id });
     expect(JSON.stringify(vars)).not.toContain('1284');
+    expect(vars.bank_account_phrase).toBe('a new bank account ending in 6 7 8 9');
+  });
+
+  it('never tells the agent "unknown" when the invoice has no bank account', () => {
+    const vars = dynamicVariablesFor({ ...invoice, bank_account: null }, call);
+    expect(vars.bank_account_phrase).toBe('a new bank account');
+    expect(JSON.stringify(vars)).not.toContain('unknown');
   });
 });
 

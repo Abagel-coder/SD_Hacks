@@ -1,3 +1,4 @@
+import { normalizeDomain } from './risk/domains';
 import type { BlocklistKind } from './types';
 
 /** One blocklisted bank account, domain or phone, with the invoice that got it blocked. */
@@ -73,4 +74,24 @@ export function toBlocklistSummary(stats: BlocklistStatsRow, rows: BlocklistEntr
 /** Bank accounts show only their last four digits; domains and phones show in full. */
 export function displayBlockedValue(kind: BlocklistKind, value: string): string {
   return kind === 'bank_account' ? `•••• ${value.slice(-4)}` : value;
+}
+
+/**
+ * What a blocked invoice put on the blocklist, in the same terms as applyDecision: the bank account
+ * if the invoice had one, and the sender domain unless it is the vendor's real domain.
+ * Null when nothing was added, so the page never claims an "account ending unknown".
+ */
+export function blockedItemsText(
+  bankAccount: string | null | undefined,
+  senderDomain: string | null | undefined,
+  realDomain: string | null | undefined,
+): string | null {
+  const digits = (bankAccount ?? '').replace(/\D/g, '');
+  const sender = normalizeDomain(senderDomain);
+  const items = [
+    digits ? `the account ending ${digits.slice(-4)}` : null,
+    sender && sender !== normalizeDomain(realDomain) ? `the sender domain ${sender}` : null,
+  ].filter((item): item is string => item !== null);
+  if (items.length === 0) return null;
+  return `${items.join(' and ')} ${items.length > 1 ? 'are' : 'is'} now on the shared blocklist`;
 }
