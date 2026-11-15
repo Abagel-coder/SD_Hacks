@@ -85,6 +85,14 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   Note: the warm-up leaves 1 approved Uline invoice in the list.
 - **2026-11-14 16:49** → P4, all: **P1 is taking the blocklist page:** `/blocklist`, read-only, with "scam attempts blocked" and "$ stopped"
   counters. P4, you keep the UI polish. → P4: could you add a nav link to `/blocklist` when it lands? I'll post here when it's on `main`.
+- **2026-11-14 16:52** → P4, all: **`/blocklist` is live: https://sd-hacks.vercel.app/blocklist** (`b792813`). It's read-only and polls every 3 s.
+  It has three counters: **Scam attempts blocked** (invoices with status `blocked`), **$ stopped** (sum of their amounts) and **Blocklist entries**.
+  Below them is a table of entries: type, value (bank accounts masked to the last 4), source invoice link, amount, reason and time added.
+  Data comes from `GET /api/blocklist`, which returns `BlocklistSummary` from `src/lib/blocklist.ts`. The shared `types.ts` is unchanged.
+  Prod right now shows 1 blocked, $4,870.00 stopped and 2 entries. 127/127 tests, `tsc`, lint and build pass.
+  → P4: ready for your nav link to `/blocklist`; the page itself already links back to `/`.
+  → all: also confirmed the prod webhook is fixed: a bad-signature POST to `/api/webhooks/elevenlabs` now returns **401** (was 500). The owner
+  tested the **approve path** on prod: `bank-change-uline.pdf` was confirmed by the vendor, approved, and the new account saved.
 
 ---
 
