@@ -13,7 +13,8 @@ export type RiskCode =
   | 'NEW_DOMAIN'
   | 'AMOUNT_ANOMALY'
   | 'URGENCY_OR_SECRECY'
-  | 'UNKNOWN_VENDOR';
+  | 'UNKNOWN_VENDOR'
+  | 'AI_FLAGGED';
 
 /** What Gemini reads off the invoice. Stored in invoices.extracted. */
 export interface ExtractedInvoice {
@@ -30,6 +31,13 @@ export interface ExtractedInvoice {
   urgencyPhrases: string[];
   secrecyPhrases: string[];
   phoneOnInvoice: string | null;
+  /** P2: anomalies Gemini noticed that the rule engine does not check. Optional, so older rows still type-check. */
+  aiIndicators?: AiIndicator[];
+}
+
+export interface AiIndicator {
+  signal: string; // what looks wrong, in a few words
+  evidence: string; // the exact text on the invoice that shows it
 }
 
 /** What Bright Data found on the public web. Stored in vendors.intel and invoices.intel. */

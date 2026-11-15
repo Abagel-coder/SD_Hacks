@@ -14,6 +14,7 @@ export interface RawExtraction {
   urgencyPhrases: string[];
   secrecyPhrases: string[];
   phoneOnInvoice: string;
+  aiIndicators?: { signal: string; evidence: string }[];
 }
 
 const text = (v: unknown): string | null => {
@@ -26,6 +27,12 @@ const isoDate = (v: unknown): string | null => {
 };
 const phrases = (v: unknown): string[] =>
   Array.isArray(v) ? v.map((p) => (typeof p === 'string' ? p.trim() : '')).filter(Boolean) : [];
+
+const indicators = (v: unknown): { signal: string; evidence: string }[] =>
+  (Array.isArray(v) ? v : [])
+    .map((i) => ({ signal: text(i?.signal), evidence: text(i?.evidence) }))
+    .filter((i): i is { signal: string; evidence: string } => i.signal !== null && i.evidence !== null)
+    .slice(0, 3);
 
 export function toExtractedInvoice(raw: RawExtraction, senderEmailHint?: string): ExtractedInvoice {
   const vendorName = text(raw.vendorName);
@@ -48,5 +55,6 @@ export function toExtractedInvoice(raw: RawExtraction, senderEmailHint?: string)
     urgencyPhrases: phrases(raw.urgencyPhrases),
     secrecyPhrases: phrases(raw.secrecyPhrases),
     phoneOnInvoice: text(raw.phoneOnInvoice),
+    ...(raw.aiIndicators === undefined ? {} : { aiIndicators: indicators(raw.aiIndicators) }),
   };
 }

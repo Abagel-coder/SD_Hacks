@@ -33,4 +33,24 @@ describe('toExtractedInvoice', () => {
   it('drops dates that are not YYYY-MM-DD', () => {
     expect(toExtractedInvoice({ ...raw, dueDate: 'Nov 16' }).dueDate).toBeNull();
   });
+
+  it('trims AI indicators, drops empty ones and keeps at most three', () => {
+    const out = toExtractedInvoice({
+      ...raw,
+      aiIndicators: [
+        { signal: ' Remit-to address differs ', evidence: ' PO Box 99 ' },
+        { signal: '', evidence: 'no signal' },
+        { signal: 'no evidence', evidence: ' ' },
+        { signal: 'b', evidence: '2' }, { signal: 'c', evidence: '3' }, { signal: 'd', evidence: '4' },
+      ],
+    });
+    expect(out.aiIndicators).toEqual([
+      { signal: 'Remit-to address differs', evidence: 'PO Box 99' },
+      { signal: 'b', evidence: '2' }, { signal: 'c', evidence: '3' },
+    ]);
+  });
+
+  it('returns no AI indicators when Gemini sends none', () => {
+    expect(toExtractedInvoice({ ...raw, aiIndicators: [] }).aiIndicators).toEqual([]);
+  });
 });
