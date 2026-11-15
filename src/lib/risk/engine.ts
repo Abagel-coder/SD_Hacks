@@ -1,27 +1,73 @@
-import type { BlocklistHit, ExtractedInvoice, RiskReason, RiskResult, VendorIntel, VendorRow } from '../types';
+import type { BlocklistHit, ExtractedInvoice, RiskCode, RiskReason, RiskResult, VendorIntel, VendorRow } from '../types';
 import { digitsOnly } from '../util';
 import { isLookalike, normalizeDomain } from './domains';
 
 const money = (n: number) =>
   `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+/** Every tunable number in the risk engine. The defaults are the production rules. */
+export interface RiskRules {
+  /** Points per rule. 0 turns the rule off entirely (no reason, no freeze). */
+  points: Record<RiskCode, number>;
+  /** Rules that freeze the payment on their own, whatever the score. */
+  hardFreeze: Record<RiskCode, boolean>;
+  freezeThreshold: number;
+  /** AMOUNT_ANOMALY fires above this multiple of the vendor's normal maximum. */
+  amountMultiplier: number;
+  /** NEW_DOMAIN fires for a sender domain younger than this many days. */
+  newDomainDays: number;
+}
+
+export const DEFAULT_RULES: RiskRules = {
+  points: {
+    BLOCKLIST_HIT: 100, BANK_CHANGED: 40, LOOKALIKE_DOMAIN: 30, DOMAIN_MISMATCH: 20, NEW_DOMAIN: 20,
+    AMOUNT_ANOMALY: 20, URGENCY_OR_SECRECY: 15, UNKNOWN_VENDOR: 10, AI_FLAGGED: 15, NO_WEB_PRESENCE: 15,
+  },
+  hardFreeze: {
+    BLOCKLIST_HIT: true, BANK_CHANGED: true, LOOKALIKE_DOMAIN: false, DOMAIN_MISMATCH: false, NEW_DOMAIN: false,
+    AMOUNT_ANOMALY: false, URGENCY_OR_SECRECY: false, UNKNOWN_VENDOR: false, AI_FLAGGED: true, NO_WEB_PRESENCE: false,
+  },
+  freezeThreshold: 50,
+  amountMultiplier: 1.5,
+  newDomainDays: 90,
+};
+
+/** A copy of the production rules with some values changed (used by the backtest). */
+export function withRules(over: {
+  points?: Partial<Record<RiskCode, number>>;
+  hardFreeze?: Partial<Record<RiskCode, boolean>>;
+  freezeThreshold?: number;
+  amountMultiplier?: number;
+  newDomainDays?: number;
+}): RiskRules {
+  return {
+    points: { ...DEFAULT_RULES.points, ...over.points },
+    hardFreeze: { ...DEFAULT_RULES.hardFreeze, ...over.hardFreeze },
+    freezeThreshold: over.freezeThreshold ?? DEFAULT_RULES.freezeThreshold,
+    amountMultiplier: over.amountMultiplier ?? DEFAULT_RULES.amountMultiplier,
+    newDomainDays: over.newDomainDays ?? DEFAULT_RULES.newDomainDays,
+  };
+}
+
 export function scoreInvoice(input: {
   invoice: ExtractedInvoice;
   vendor: VendorRow | null;
   intel: VendorIntel;
   blocklistHits: BlocklistHit[];
-}): RiskResult {
+}, rules: RiskRules = DEFAULT_RULES): RiskResult {
   const { invoice, vendor, intel, blocklistHits } = input;
   const reasons: RiskReason[] = [];
   let hardFreeze = false;
+  const add = (code: RiskCode, detail: string) => {
+    const points = rules.points[code];
+    if (!(points > 0)) return;
+    reasons.push({ code, points, detail });
+    if (rules.hardFreeze[code]) hardFreeze = true;
+  };
 
   for (const hit of blocklistHits) {
     const label = hit.kind === 'domain' ? 'Sender domain' : hit.kind === 'phone' ? 'Phone number' : 'Bank account';
-    reasons.push({
-      code: 'BLOCKLIST_HIT', points: 100,
-      detail: `${label} ${hit.value} is on the scam blocklist (${hit.reason}).`,
-    });
-    hardFreeze = true;
+    add('BLOCKLIST_HIT', `${label} ${hit.value} is on the scam blocklist (${hit.reason}).`);
   }
 
   if (vendor) {
@@ -32,34 +78,21 @@ export function scoreInvoice(input: {
     const accountChanged = accountOnFile !== '' && accountGiven !== '' && accountOnFile !== accountGiven;
     const routingChanged = routingOnFile !== '' && routingGiven !== '' && routingOnFile !== routingGiven;
     if (accountChanged || routingChanged) {
-      reasons.push({
-        code: 'BANK_CHANGED', points: 40,
-        detail: accountChanged
+      add('BANK_CHANGED', accountChanged
           ? `Bank account ending ${accountGiven.slice(-4)} does not match the account on file for ${vendor.name} (ending ${accountOnFile.slice(-4)}).`
-          : `Routing number does not match the one on file for ${vendor.name}.`,
-      });
-      hardFreeze = true;
+          : `Routing number does not match the one on file for ${vendor.name}.`);
     }
   } else {
-    reasons.push({
-      code: 'UNKNOWN_VENDOR', points: 10,
-      detail: `No payment history with "${invoice.vendorName}".`,
-    });
+    add('UNKNOWN_VENDOR', `No payment history with "${invoice.vendorName}".`);
   }
 
   const sender = normalizeDomain(invoice.senderDomain ?? invoice.senderEmail);
   const real = normalizeDomain(vendor?.real_domain ?? intel.realDomain);
   if (sender && real && sender !== real) {
     if (isLookalike(sender, real)) {
-      reasons.push({
-        code: 'LOOKALIKE_DOMAIN', points: 30,
-        detail: `Sender domain ${sender} imitates the vendor's real domain ${real}.`,
-      });
+      add('LOOKALIKE_DOMAIN', `Sender domain ${sender} imitates the vendor's real domain ${real}.`);
     } else {
-      reasons.push({
-        code: 'DOMAIN_MISMATCH', points: 20,
-        detail: `Sender domain ${sender} is not the vendor's public domain ${real}.`,
-      });
+      add('DOMAIN_MISMATCH', `Sender domain ${sender} is not the vendor's public domain ${real}.`);
     }
   }
 
@@ -67,32 +100,20 @@ export function scoreInvoice(input: {
   // search (null) is never treated as "no presence". Add-only, no freeze.
   const presence = intel.senderWebPresence;
   if (sender && sender !== real && presence && presence.results > 0 && presence.mentions === 0) {
-    reasons.push({
-      code: 'NO_WEB_PRESENCE', points: 15,
-      detail: `Sender domain ${sender} has no public web presence: 0 of ${presence.results} search results mention it.`,
-    });
+    add('NO_WEB_PRESENCE', `Sender domain ${sender} has no public web presence: 0 of ${presence.results} search results mention it.`);
   }
 
-  if (intel.senderDomainAgeDays !== null && intel.senderDomainAgeDays < 90) {
-    reasons.push({
-      code: 'NEW_DOMAIN', points: 20,
-      detail: `Sender domain was registered ${intel.senderDomainAgeDays} days ago.`,
-    });
+  if (intel.senderDomainAgeDays !== null && intel.senderDomainAgeDays < rules.newDomainDays) {
+    add('NEW_DOMAIN', `Sender domain was registered ${intel.senderDomainAgeDays} days ago.`);
   }
 
-  if (vendor?.amount_max && invoice.amount > vendor.amount_max * 1.5) {
-    reasons.push({
-      code: 'AMOUNT_ANOMALY', points: 20,
-      detail: `${money(invoice.amount)} is far above this vendor's normal range (${money(vendor.amount_min ?? 0)} to ${money(vendor.amount_max)}).`,
-    });
+  if (vendor?.amount_max && invoice.amount > vendor.amount_max * rules.amountMultiplier) {
+    add('AMOUNT_ANOMALY', `${money(invoice.amount)} is far above this vendor's normal range (${money(vendor.amount_min ?? 0)} to ${money(vendor.amount_max)}).`);
   }
 
   const phrases = [...invoice.urgencyPhrases, ...invoice.secrecyPhrases];
   if (phrases.length > 0) {
-    reasons.push({
-      code: 'URGENCY_OR_SECRECY', points: 15,
-      detail: `Pressure language: "${phrases[0]}".`,
-    });
+    add('URGENCY_OR_SECRECY', `Pressure language: "${phrases[0]}".`);
   }
 
   // P2: Gemini's second opinion. Add-only and capped at 15, so a prompt-injected invoice can only
@@ -100,15 +121,11 @@ export function scoreInvoice(input: {
   // toward a verification call, never toward approval, so it is safe against injection.
   const ai = invoice.aiIndicators ?? [];
   if (ai.length > 0) {
-    hardFreeze = true;
     const more = ai.length > 1 ? ` (and ${ai.length - 1} more)` : '';
-    reasons.push({
-      code: 'AI_FLAGGED', points: 15,
-      detail: `Gemini flagged: ${ai[0].signal}: "${ai[0].evidence.replace(/[.\s]+$/, '')}"${more}.`,
-    });
+    add('AI_FLAGGED', `Gemini flagged: ${ai[0].signal}: "${ai[0].evidence.replace(/[.\s]+$/, '')}"${more}.`);
   }
 
   const sum = reasons.reduce((total, r) => total + r.points, 0);
   const score = Math.min(100, sum);
-  return { score, reasons, freeze: hardFreeze || score >= 50 };
+  return { score, reasons, freeze: hardFreeze || score >= rules.freezeThreshold };
 }
