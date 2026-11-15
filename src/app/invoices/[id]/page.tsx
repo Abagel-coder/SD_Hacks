@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { AppNav } from '@/components/AppNav';
 import { AuditLog } from '@/components/AuditLog';
 import { CallPanel } from '@/components/CallPanel';
+import { ComparisonPanel } from '@/components/ComparisonPanel';
 import { RiskPanel } from '@/components/RiskPanel';
 import { StatusBadge } from '@/components/StatusBadge';
 import { VendorCheck } from '@/components/VendorCheck';
@@ -84,6 +85,8 @@ export default function InvoicePage() {
         )}
       </header>
 
+      <ComparisonPanel invoice={invoice} vendor={vendor} />
+
       <div className="grid items-start gap-4 md:grid-cols-2">
         <div className="space-y-4">
           <RiskPanel invoice={invoice} />
@@ -91,14 +94,6 @@ export default function InvoicePage() {
         <div className="space-y-4">
           <CallPanel detail={data} onChange={refresh} />
           <VendorCheck invoice={invoice} />
-          <section className="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-900">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Bank details</h2>
-            <p className="mt-2">On this invoice: account ending {invoice.bank_account?.slice(-4) ?? 'n/a'}</p>
-            <p>
-              On file now for {vendor?.name ?? 'this vendor'}:{' '}
-              {vendor?.bank_account ? `account ending ${vendor.bank_account.slice(-4)}` : 'nothing on file'}
-            </p>
-          </section>
         </div>
       </div>
 
