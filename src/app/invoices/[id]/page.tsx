@@ -15,7 +15,7 @@ const STATUS_SHELL: Partial<Record<InvoiceStatus, string>> = {
   frozen: 'border-amber-400 bg-amber-50',
   verifying: 'border-blue-500 bg-blue-50',
   blocked: 'border-red-600 bg-red-50',
-  approved: 'border-green-300 bg-green-50',
+  approved: 'border-green-500 bg-green-50',
 };
 
 export default function InvoicePage() {
@@ -24,17 +24,19 @@ export default function InvoicePage() {
 
   if (!data) {
     return (
-      <main className="mx-auto max-w-5xl space-y-6 p-6 text-gray-900">
+      <main className="mx-auto w-full max-w-5xl space-y-6 p-6 text-gray-900">
         <AppNav current="invoices" />
         <p className="text-sm text-gray-600">{error ? 'Invoice not found.' : 'Loading…'}</p>
       </main>
     );
   }
-  const { invoice, vendor } = data;
+  const { invoice, vendor, call } = data;
   const shell = STATUS_SHELL[invoice.status] ?? 'border-gray-200 bg-white';
+  const blocklisted = (invoice.risk_reasons ?? []).some((reason) => reason.code === 'BLOCKLIST_HIT');
+  const hasReasons = (invoice.risk_reasons ?? []).length > 0;
 
   return (
-    <main className="mx-auto max-w-5xl space-y-6 p-6 text-gray-900">
+    <main className="mx-auto w-full max-w-5xl space-y-6 p-6 text-gray-900">
       <AppNav current="invoices" />
 
       <header className={`rounded-xl border-2 p-5 transition-colors duration-500 ${shell}`}>
@@ -47,7 +49,7 @@ export default function InvoicePage() {
               {invoice.due_date ?? 'n/a'}
             </p>
           </div>
-          <div className="flex flex-col items-end gap-3">
+          <div className="flex flex-col items-start gap-3 sm:items-end">
             <p className="text-2xl font-bold tabular-nums">{money(invoice.amount, invoice.currency)}</p>
             <StatusBadge status={invoice.status} size="lg" />
           </div>
@@ -61,7 +63,9 @@ export default function InvoicePage() {
         )}
         {invoice.status === 'frozen' && (
           <p className="mt-4 text-sm font-semibold text-amber-950">
-            Payment frozen. Nothing will be paid until the vendor is verified in the browser.
+            {blocklisted
+              ? 'Matches a known scam on the blocklist. Payment stays frozen.'
+              : 'Payment frozen. Nothing will be paid until the vendor confirms on a verification call.'}
           </p>
         )}
         {invoice.status === 'verifying' && (
@@ -69,26 +73,36 @@ export default function InvoicePage() {
             Verification in progress — watch the badge flip when the call finishes.
           </p>
         )}
+        {invoice.status === 'approved' && (
+          <p className="mt-4 text-sm font-semibold text-green-900">
+            {call?.outcome === 'confirmed'
+              ? 'Payment approved. The vendor confirmed the bank details on a verification call.'
+              : hasReasons
+                ? 'Payment approved. The risk score was below the freeze threshold.'
+                : 'Payment approved. No risk signals.'}
+          </p>
+        )}
       </header>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid items-start gap-4 md:grid-cols-2">
         <div className="space-y-4">
           <RiskPanel invoice={invoice} />
+        </div>
+        <div className="space-y-4">
+          <CallPanel detail={data} onChange={refresh} />
           <VendorCheck invoice={invoice} />
           <section className="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-900">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Bank details</h2>
             <p className="mt-2">On this invoice: account ending {invoice.bank_account?.slice(-4) ?? 'n/a'}</p>
             <p>
-              On file for {vendor?.name ?? 'this vendor'}:{' '}
+              On file now for {vendor?.name ?? 'this vendor'}:{' '}
               {vendor?.bank_account ? `account ending ${vendor.bank_account.slice(-4)}` : 'nothing on file'}
             </p>
           </section>
         </div>
-        <div className="space-y-4">
-          <CallPanel detail={data} onChange={refresh} />
-          <AuditLog rows={data.audit} />
-        </div>
       </div>
+
+      <AuditLog rows={data.audit} />
     </main>
   );
 }

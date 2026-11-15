@@ -55,17 +55,18 @@ function CallControls({ callId }: { callId: string }) {
   return (
     <div className="space-y-2">
       {status === 'connected' ? (
-        <button onClick={() => endSession()} className="rounded bg-red-600 px-3 py-2 text-sm font-medium text-white">
+        <button onClick={() => endSession()}
+          className="rounded-lg bg-red-600 px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-red-700">
           End call
         </button>
       ) : (
         <button onClick={start} disabled={status === 'connecting'}
-          className="rounded bg-gray-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50">
+          className="rounded-lg bg-blue-600 px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50">
           {status === 'connecting' ? 'Connecting…' : 'Start browser call'}
         </button>
       )}
       <p className="text-sm text-gray-600">
-        {status === 'connected' ? 'The agent is speaking. Answer as the vendor.' : 'Uses this device\'s microphone and speaker.'}
+        {status === 'connected' ? 'The agent is speaking. Answer as the vendor.' : 'Uses your microphone. The agent speaks first.'}
       </p>
       {error && <p className="text-sm text-red-700">{error}</p>}
     </div>

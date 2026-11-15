@@ -1,18 +1,10 @@
-import Link from 'next/link';
-import type { InvoiceRow, RiskCode } from '@/lib/types';
+'use client';
 
-const REASON_TITLE: Partial<Record<RiskCode, string>> = {
-  BLOCKLIST_HIT: 'Already on the scam blocklist',
-  BANK_CHANGED: 'Bank details do not match history',
-  LOOKALIKE_DOMAIN: 'Sender domain looks like the real vendor',
-  DOMAIN_MISMATCH: 'Sender domain is not the vendor’s site',
-  NEW_DOMAIN: 'Sender domain is brand new',
-  AMOUNT_ANOMALY: 'Amount is far above normal',
-  URGENCY_OR_SECRECY: 'Pressure or secrecy language',
-  UNKNOWN_VENDOR: 'No payment history with this vendor',
-  AI_FLAGGED: 'Gemini flagged a warning sign',
-  NO_WEB_PRESENCE: 'Sender domain has no public web presence',
-};
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
+import { maskLongNumbers } from '@/lib/format';
+import { REASON_TITLE } from '@/lib/risk-labels';
+import type { InvoiceRow } from '@/lib/types';
 
 function formatBlockedDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -28,19 +20,54 @@ function scoreTone(score: number): { text: string; bar: string; label: string } 
   return { text: 'text-green-700', bar: 'bg-green-600', label: 'Looks consistent with history' };
 }
 
+/** The Gemini explanation, clamped to 3 lines with a toggle when it runs longer. */
+function Explanation({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+  const ref = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || open) return;
+    const observer = new ResizeObserver(() => setOverflows(el.scrollHeight > el.clientHeight + 1));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [open, text]);
+
+  return (
+    <div className="mt-4 rounded-md bg-gray-50 p-3 text-sm leading-relaxed text-gray-800">
+      <p ref={ref} className={open ? '' : 'line-clamp-3'}>{text}</p>
+      {(overflows || open) && (
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className="mt-1 text-xs font-semibold text-blue-700 underline underline-offset-2"
+        >
+          {open ? 'Show less' : 'Show more'}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function RiskPanel({ invoice }: { invoice: InvoiceRow }) {
   const score = invoice.risk_score ?? 0;
   const reasons = invoice.risk_reasons ?? [];
   const tone = scoreTone(score);
+  const decided = invoice.status === 'approved' || invoice.status === 'blocked';
+  const capped = reasons.reduce((sum, reason) => sum + reason.points, 0) > 100;
 
   return (
     <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Risk score</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">
+            {decided ? 'Risk score at upload' : 'Risk score'}
+          </h2>
           <p className={`mt-1 text-4xl font-bold tabular-nums ${tone.text}`}>
             {score}
             <span className="text-lg font-normal text-gray-500"> / 100</span>
+            {capped && <span className="ml-2 text-xs font-normal text-gray-500">(capped at 100)</span>}
           </p>
           <p className={`mt-1 text-sm font-medium ${tone.text}`}>{tone.label}</p>
         </div>
@@ -49,12 +76,6 @@ export function RiskPanel({ invoice }: { invoice: InvoiceRow }) {
       <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100" aria-hidden>
         <div className={`h-full rounded-full transition-all duration-500 ${tone.bar}`} style={{ width: `${Math.min(100, score)}%` }} />
       </div>
-
-      {invoice.explanation && (
-        <p className="mt-3 rounded-md bg-gray-50 p-3 text-sm leading-relaxed text-gray-800">
-          {invoice.explanation}
-        </p>
-      )}
 
       {invoice.similar_scam && (
         <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-950">
@@ -79,13 +100,15 @@ export function RiskPanel({ invoice }: { invoice: InvoiceRow }) {
                 </p>
                 <span className="shrink-0 text-sm font-bold tabular-nums text-red-700">+{reason.points}</span>
               </div>
-              <p className="mt-1 text-sm leading-relaxed text-gray-700">{reason.detail}</p>
+              <p className="mt-1 text-sm leading-relaxed text-gray-700">{maskLongNumbers(reason.detail)}</p>
             </li>
           ))}
         </ul>
       ) : (
         <p className="mt-3 text-sm text-gray-600">No risk signals on this invoice.</p>
       )}
+
+      {invoice.explanation && <Explanation text={invoice.explanation} />}
     </section>
   );
 }
