@@ -20,9 +20,8 @@ export function dynamicVariablesFor(invoice: InvoiceRow, call: CallRow): Record<
     vendor_name: invoice.vendor_name,
     bank_last4: last4 ? last4.split('').join(' ') : 'unknown', // spaced so it is read digit by digit
     challenge_question: call.challenge_question ?? 'none',
-    // P2 two-channel: whether a code was emailed, and to which public address (masked). Never the code.
-    email_code_sent: call.email_code && call.code_check !== 'not_sent' ? 'yes' : 'no',
-    email_hint: call.email_code && call.email_found ? maskEmail(call.email_found) : 'none',
+    // P2 two-channel: the live agent's step 4b runs when code_email is not "none". Masked address only, never the code.
+    code_email: call.email_code && call.code_check !== 'not_sent' && call.email_found ? maskEmail(call.email_found) : 'none',
     call_id: call.id,
     invoice_id: invoice.id,
   };

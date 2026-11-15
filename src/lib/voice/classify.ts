@@ -26,7 +26,7 @@ export function reportFromAnalysis(analysis: unknown, expectedAmount: number | n
     : typeof amountRaw === 'string' ? Number(amountRaw.replace(/[^0-9.]/g, '')) : NaN;
 
   // P2 two-channel: the digits the person read back from the emailed code, when the agent asked.
-  const codeRaw = results?.code_read_back?.value;
+  const codeRaw = results?.stated_code?.value ?? results?.code_read_back?.value;
   const code = typeof codeRaw === 'string' ? codeRaw.trim() : typeof codeRaw === 'number' ? String(codeRaw) : '';
 
   return {
