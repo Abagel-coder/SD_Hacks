@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { AlertBanner } from '@/components/AlertBanner';
 import { StatusBadge } from '@/components/StatusBadge';
 import { UploadCard } from '@/components/UploadCard';
@@ -9,11 +9,12 @@ import { money } from '@/lib/format';
 import type { InvoiceRow } from '@/lib/types';
 
 export default function Dashboard() {
+  const router = useRouter();
   const { data, error, refresh } = usePoll<{ invoices: InvoiceRow[] }>('/api/invoices');
   const invoices = data?.invoices ?? [];
 
   return (
-    <main className="mx-auto max-w-5xl space-y-6 p-6">
+    <main className="mx-auto max-w-5xl space-y-6 p-6 text-gray-900">
       <header>
         <h1 className="text-2xl font-bold">Invoice Guard</h1>
         <p className="text-sm text-gray-600">
@@ -39,11 +40,21 @@ export default function Dashboard() {
         </thead>
         <tbody>
           {invoices.map((invoice) => (
-            <tr key={invoice.id} className="border-b hover:bg-gray-50">
-              <td className="py-2 font-medium">
-                <Link href={`/invoices/${invoice.id}`} className="underline-offset-2 hover:underline">
-                  {invoice.vendor_name}
-                </Link>
+            <tr
+              key={invoice.id}
+              role="link"
+              tabIndex={0}
+              className="cursor-pointer border-b hover:bg-gray-50"
+              onClick={() => router.push(`/invoices/${invoice.id}`)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  router.push(`/invoices/${invoice.id}`);
+                }
+              }}
+            >
+              <td className="py-2 font-medium text-gray-900 underline-offset-2 hover:underline">
+                {invoice.vendor_name}
               </td>
               <td>{invoice.invoice_number ?? 'n/a'}</td>
               <td>{invoice.invoice_date ?? 'n/a'}</td>

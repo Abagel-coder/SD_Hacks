@@ -1,7 +1,10 @@
 # Demo script (about 3 minutes)
 
-Roles: Presenter (talks, drives the laptop), Vendor (holds the demo phone on speaker),
-Operator (second laptop, ready with the fallbacks below).
+Roles: Presenter (talks, drives the laptop), Vendor (answers the **browser** verification call
+into the laptop microphone), Operator (second laptop, ready with the fallbacks below).
+
+The team is **not using Twilio**. Live verification is the ElevenLabs browser call
+(`CALL_CHANNEL=browser`). Mock mode (`MOCK_CALL=1`) still flips the badge without a real call.
 
 ## Before going on
 
@@ -9,7 +12,7 @@ Operator (second laptop, ready with the fallbacks below).
 2. Warm the Bright Data intel cache (live only; refuses mock flags):
    `MOCK_GEMINI=0 MOCK_BRIGHTDATA=0 npx tsx --env-file=.env.local scripts/warm-intel.ts`
 3. Open the production URL. Confirm 18 approved invoices.
-4. Demo phone: volume up, Do Not Disturb off, on the table next to the microphone.
+4. Laptop mic ready; allow microphone access when the browser asks. Vendor sits next to the laptop.
 5. `samples/legit-uline.pdf` and `samples/scam-uline.pdf` are on the desktop.
 6. The backup video is open in a tab.
 
@@ -27,9 +30,10 @@ Operator (second laptop, ready with the fallbacks below).
    Bright Data checked the public web live: Uline's real site is uline.com, and this came from
    u1ine.com with a number one. Score 100. The payment is frozen." Point at the Gemini explanation.
 4. **The call (60 s).** "Now the agent verifies, using the phone number Bright Data found on
-   Uline's real website, never the number on the invoice." Click **Verify by phone**.
-   The phone rings. Vendor answers: "Accounts receivable." Agent asks about the bank change.
-   Vendor: **"No. We never changed banks."**
+   Uline's real website, never the number on the invoice — here as a live browser call through
+   ElevenLabs." Click **Verify in browser** (or **Verify by phone** if `MOCK_CALL=1` for the
+   mock path). Allow the mic. Vendor answers into the laptop: "Accounts receivable." Agent asks
+   about the bank change. Vendor: **"No. We never changed banks."**
    Stay silent and let the audience watch the badge flip to **Blocked**.
 5. **The result (30 s).** Show the transcript and the audit log. "Every step the agent took is in
    Neon with its inputs and its reason. The scammer's account and domain are now on a shared
@@ -42,8 +46,8 @@ Operator (second laptop, ready with the fallbacks below).
 
 | Problem | Do this |
 |---|---|
-| Phone does not ring within 10 seconds | Wait for the status to return to Frozen, then click **Verify in browser** and have the Vendor answer into the laptop microphone |
-| Browser call does not connect | Operator switches the projector to the second laptop, which runs locally with `MOCK_CALL=1` |
+| Browser call does not connect within 10 seconds | Wait for Frozen, click **Verify in browser** again, re-allow the mic; Vendor answers into the laptop microphone |
+| Browser call still fails | Operator switches the projector to the second laptop, which runs locally with `MOCK_CALL=1` |
 | Upload hangs past 40 seconds | Reload and upload again; Operator sets `MOCK_BRIGHTDATA=1` on the local fallback |
 | Venue wifi is down | Play the backup video |
 
@@ -52,7 +56,7 @@ Operator (second laptop, ready with the fallbacks below).
 - [ ] Legit invoice: approved, risk 0
 - [ ] Scam invoice: frozen, risk 70 or more, at least three reasons, explanation shown
 - [ ] Public web check shows uline.com and "No" for the sender match
-- [ ] Phone rings within 10 seconds of the click
+- [ ] Browser call connects (or mock path completes) within 10 seconds of the click
 - [ ] "We never changed banks" gives Blocked within 20 seconds of hanging up
 - [ ] Transcript and audit log are visible
 - [ ] Re-uploading the scam shows a blocklist reason
