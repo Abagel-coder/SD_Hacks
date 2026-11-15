@@ -7,6 +7,7 @@ import { CallPanel } from '@/components/CallPanel';
 import { ComparisonPanel } from '@/components/ComparisonPanel';
 import { RiskPanel } from '@/components/RiskPanel';
 import { StatusBadge } from '@/components/StatusBadge';
+import { StatusTimeline } from '@/components/StatusTimeline';
 import { VendorCheck } from '@/components/VendorCheck';
 import { usePoll } from '@/hooks/usePoll';
 import { money } from '@/lib/format';
@@ -84,6 +85,8 @@ export default function InvoicePage() {
           </p>
         )}
       </header>
+
+      <StatusTimeline status={invoice.status} call={call} />
 
       <ComparisonPanel invoice={invoice} vendor={vendor} />
 
