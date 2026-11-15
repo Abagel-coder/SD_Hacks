@@ -2,11 +2,13 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
+import { UploadProgress } from '@/components/UploadProgress';
 import type { InvoiceRow } from '@/lib/types';
 
 export function UploadCard({ onUploaded }: { onUploaded: () => void }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [finished, setFinished] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -18,12 +20,16 @@ export function UploadCard({ onUploaded }: { onUploaded: () => void }) {
       return;
     }
     setBusy(true);
+    setFinished(false);
     setError(null);
     try {
       const res = await fetch('/api/invoices', { method: 'POST', body: form });
       const json = (await res.json()) as { invoice?: InvoiceRow; error?: string };
       if (!res.ok || !json.invoice) throw new Error(json.error ?? 'Upload failed.');
       onUploaded();
+      // Let the last step tick to done before leaving the page.
+      setFinished(true);
+      await new Promise((resolve) => setTimeout(resolve, 450));
       router.push(`/invoices/${json.invoice.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed.');
@@ -56,7 +62,7 @@ export function UploadCard({ onUploaded }: { onUploaded: () => void }) {
         className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50">
         {busy ? 'Checking invoice…' : 'Check invoice'}
       </button>
-      {busy && <span className="text-sm text-gray-700">Reading, verifying the vendor and scoring. This takes up to 30 seconds.</span>}
+      {busy && <UploadProgress done={finished} />}
       {error && <span className="text-sm text-red-700">{error}</span>}
     </form>
   );
