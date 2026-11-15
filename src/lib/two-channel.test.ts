@@ -88,12 +88,13 @@ describe('startVerificationCall with the email code', () => {
     expect(f).toMatchObject({ emailFound: 'customer.service@uline.com', emailSentTo: null, emailCode: null, codeCheck: 'not_sent' });
   });
 
-  it('tells the agent a code was sent and where, but never the code itself', () => {
+  it('tells the live agent where a code was sent via code_email (its step 4b), but never the code itself', () => {
     const call = { ...baseCall, email_found: 'customer.service@uline.com', email_sent_to: 'demo@team.dev', email_code: '429117', code_check: null };
     const vars = dynamicVariablesFor(invoice, call);
-    expect(vars).toMatchObject({ email_code_sent: 'yes', email_hint: 'c***@uline.com' });
+    expect(vars).toMatchObject({ code_email: 'c***@uline.com' });
     expect(JSON.stringify(vars)).not.toContain('429117');
-    expect(dynamicVariablesFor(invoice, baseCall)).toMatchObject({ email_code_sent: 'no' });
+    expect(dynamicVariablesFor(invoice, baseCall)).toMatchObject({ code_email: 'none' });
+    expect(dynamicVariablesFor(invoice, { ...call, email_code: null, code_check: 'not_sent' })).toMatchObject({ code_email: 'none' });
   });
 });
 
@@ -107,8 +108,18 @@ describe('finalizeCall with the email code', () => {
     } },
   });
 
-  it('reads the code back from the agent\'s data collection', () => {
+  it('reads the code back from the live agent\'s stated_code field, falling back to code_read_back', () => {
+    const stated = { data_collection_results: { bank_change_confirmed: { value: 'yes' }, stated_amount: { value: 1284.5 }, stated_code: { value: '429117' } } };
+    expect(reportFromAnalysis(stated, 1284.5)?.codeReadBack).toBe('429117');
     expect(reportFromAnalysis(conversation('4 2 9 1 1 7').analysis, 1284.5)?.codeReadBack).toBe('4 2 9 1 1 7');
+  });
+
+  it('approves when the live agent reports the right code in stated_code', async () => {
+    await finalizeCall(sent, {
+      conversation_id: 'conv_2', transcript: [{ role: 'user' as const, message: 'Yes.' }],
+      analysis: { data_collection_results: { bank_change_confirmed: { value: 'yes' }, stated_amount: { value: 1284.5 }, stated_code: { value: '429117' } } },
+    });
+    expect(m.updateCall).toHaveBeenCalledWith(sent.id, expect.objectContaining({ outcome: 'confirmed', codeCheck: 'passed' }));
   });
 
   it('approves a "yes" with the right amount and the right code', async () => {
