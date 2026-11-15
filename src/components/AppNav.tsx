@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { AccountChip } from '@/components/AccountChip';
 import { Logo } from '@/components/Logo';
+import { SessionNav } from '@/components/SessionNav';
 
 type Page = 'home' | 'invoices' | 'blocklist' | 'backtest';
 
@@ -29,8 +29,8 @@ export function AppNav({ current }: { current: Page }) {
         {link('/invoices', 'invoices', 'Invoices')}
         {link('/blocklist', 'blocklist', 'Blocklist')}
         {link('/backtest', 'backtest', 'Backtest')}
-        <span className="ml-2 hidden sm:block">
-          <AccountChip kind="business" />
+        <span className="ml-2">
+          <SessionNav />
         </span>
       </div>
     </nav>

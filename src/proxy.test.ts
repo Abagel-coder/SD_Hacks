@@ -53,10 +53,29 @@ describe('proxy (login gate)', () => {
       expect(proxy(req('/api/webhooks/other')).status).toBe(401);
     });
 
-    it('leaves /login and the login API open', () => {
+    it('leaves the landing page, /login and the auth APIs open', () => {
       on();
-      expect(proxy(req('/login')).headers.get('x-middleware-next')).toBe('1');
-      expect(proxy(req('/api/auth/login')).headers.get('x-middleware-next')).toBe('1');
+      for (const path of ['/', '/login', '/api/auth/login', '/api/auth/session', '/api/auth/logout']) {
+        expect(proxy(req(path)).headers.get('x-middleware-next'), path).toBe('1');
+      }
+    });
+
+    it('redirects every business page to /login and back', () => {
+      on();
+      for (const path of ['/invoices', '/invoices/abc', '/blocklist', '/backtest', '/vendor']) {
+        const res = proxy(req(path));
+        expect(res.status, path).toBe(307);
+        const location = new URL(res.headers.get('location')!);
+        expect(location.pathname).toBe('/login');
+        expect(location.searchParams.get('next')).toBe(path);
+      }
+    });
+
+    it('returns 401 for every business API', () => {
+      on();
+      for (const path of ['/api/invoices', '/api/invoices/abc', '/api/invoices/abc/verify', '/api/blocklist', '/api/backtest', '/api/calls/abc/sync']) {
+        expect(proxy(req(path)).status, path).toBe(401);
+      }
     });
   });
 

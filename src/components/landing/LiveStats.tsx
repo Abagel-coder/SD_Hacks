@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { CountUp } from '@/components/CountUp';
 import { Spotlight } from '@/components/Spotlight';
 import { usePoll } from '@/hooks/usePoll';
@@ -7,7 +8,16 @@ import { money } from '@/lib/format';
 import type { InvoiceRow } from '@/lib/types';
 
 export function LiveStats() {
-  const { data } = usePoll<{ invoices: InvoiceRow[] }>('/api/invoices', 5000);
+  const { data, error } = usePoll<{ invoices: InvoiceRow[] }>('/api/invoices', 5000);
+  // Logged out, the invoices API answers 401: invite a login rather than showing zeros.
+  if (!data && error?.includes('401')) {
+    return (
+      <div className="card flex flex-wrap items-center justify-between gap-4 p-6">
+        <p className="text-sm text-gray-500">Log in to see live numbers from Harbor Coffee Roasters&apos; invoices.</p>
+        <Link href="/login" className="btn">Log in</Link>
+      </div>
+    );
+  }
   const invoices = data?.invoices ?? [];
   const blocked = invoices.filter((invoice) => invoice.status === 'blocked');
   const saved = blocked.reduce((sum, invoice) => sum + (invoice.amount ?? 0), 0);

@@ -53,8 +53,9 @@ describe('password check', () => {
 describe('safeNextPath', () => {
   it('keeps same-site paths and drops the rest', () => {
     expect(safeNextPath('/invoices?x=1')).toBe('/invoices?x=1');
-    expect(safeNextPath('//evil.example')).toBe('/');
-    expect(safeNextPath('https://evil.example')).toBe('/');
-    expect(safeNextPath(null)).toBe('/');
+    expect(safeNextPath('//evil.example')).toBe('/invoices');
+    expect(safeNextPath('https://evil.example')).toBe('/invoices');
+    expect(safeNextPath(null)).toBe('/invoices');
+    expect(safeNextPath(null, '/')).toBe('/');
   });
 });

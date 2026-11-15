@@ -2,7 +2,10 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { gate } from '@/lib/auth/gate';
 import { SESSION_COOKIE } from '@/lib/auth/session';
 
-/** Business login gate (Next 16 renamed middleware to proxy). Off when BUSINESS_PASSWORD is unset. */
+/**
+ * Business login gate (Next 16 renamed middleware to proxy). The landing page is public; the business
+ * pages and their APIs need the session cookie. Off when BUSINESS_PASSWORD is unset.
+ */
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const result = gate(pathname, request.cookies.get(SESSION_COOKIE)?.value);
@@ -13,7 +16,7 @@ export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   url.pathname = '/login';
   url.search = '';
-  if (pathname !== '/') url.searchParams.set('next', pathname + search);
+  url.searchParams.set('next', pathname + search);
   return NextResponse.redirect(url);
 }
 

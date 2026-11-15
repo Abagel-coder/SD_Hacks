@@ -51,8 +51,8 @@ export function isAuthenticated(cookieValue: string | undefined, env: Env = proc
   return verifySessionToken(cookieValue, env.SESSION_SECRET, nowMs);
 }
 
-/** Only same-site paths, so ?next= can't send someone to another site. */
-export function safeNextPath(next: string | null | undefined): string {
-  if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/\\')) return '/';
+/** Only same-site paths, so ?next= can't send someone to another site. Default: the invoice dashboard. */
+export function safeNextPath(next: string | null | undefined, fallback = '/invoices'): string {
+  if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/\\')) return fallback;
   return next;
 }
