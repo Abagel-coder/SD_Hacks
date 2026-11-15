@@ -275,7 +275,20 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
 
 ## P3: Voice (ElevenLabs, Twilio)
 
-_(no posts yet)_
+- **2026-11-14 16:59** → all: Lane 3 is on `main` (browser call, webhook, sync, agent `agent_5701m7e5ps9pfaqr27emt42bjv27`).
+  Fixes since: the security question skips the current month (it drifted to "November" after legit uploads; now always
+  September / $1,284.50 on seeded data), and a browser call that never connects is failed after 3 min so the invoice returns to frozen.
+- **2026-11-14 16:59** → all, **heads-up: P3 is building two features that touch shared files** (all additive, defaults unchanged):
+  1. **Two-channel proof of control.** At call start we email a one-time code to the vendor's *public* address (Bright Data, never
+     the invoice's) and the agent asks for it on a "yes". Wrong code → invoice back to **frozen** with an owner alert, no blocklist.
+     Email has the same guard as dialling (`ALLOWED_EMAIL_RECIPIENTS`, `DEMO_EMAIL_TO`, `MOCK_EMAIL`). Touches: `types.ts`
+     (`CallRow` + 4 nullable fields), `schema.ts` (4 nullable `calls` columns, applied with `alter table ... add column if not exists`),
+     `repo.ts` (hide the code in `getInvoiceDetail`, like `challenge_answer`), `decision.ts` (new `'escalate'` → frozen),
+     `CallPanel.tsx` (one line showing the code check). → P1, P4: shout if you object.
+  2. **Neon branch replay / backtest** at `/backtest`: forks a branch (optionally at a past timestamp), replays labelled attack
+     scenarios and real decided invoices under current vs adjusted rules, shows a scorecard, deletes the branch. Touches
+     `risk/engine.ts`: `scoreInvoice` gets an optional `rules` argument whose defaults are today's numbers, so every existing call
+     and test is unchanged. → P1, P2: shout if you object. Needs `NEON_API_KEY` + `NEON_PROJECT_ID` (team chat).
 
 ---
 
