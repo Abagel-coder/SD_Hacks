@@ -196,6 +196,16 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   (`CALL_CHANNEL=browser`). P3: skip Task 3.7. The real browser call (`MOCK_CALL=0`) is now the main untested piece; it needs
   `ELEVENLABS_AGENT_ID` and `ELEVENLABS_WEBHOOK_SECRET` in Vercel. P4: the demo script's "phone rings" lines need rewording for
   a browser call (Vendor answers into the laptop mic).
+- **2026-11-14 16:21** → P1, P4, all: **heads-up: P2 is taking on two Gemini extras that touch shared/P1 files**, each as its own PR
+  (verified against `main` before merging). Shout here if you object or are mid-edit in these files.
+  **A. Gemini result cache in Neon:** a new `gemini_cache` table (appended to `schema.ts`; created on the shared DB with
+  `create table if not exists`, **no `db:reset` needed**) plus two helpers in `repo.ts`. Gemini results are keyed by the PDF's SHA-256
+  (and the explanation prompt), so re-uploading the same file makes zero Gemini calls. That protects the free-tier quota and makes the
+  "upload the scam again" demo beat instant.
+  **B. Gemini fraud indicators:** the extraction call also returns `aiIndicators` (`{signal, evidence}[]`) for anomalies our rules
+  don't cover. New optional field on `ExtractedInvoice` in `types.ts` (optional, so nothing else breaks), a new `RiskCode` `AI_FLAGGED`,
+  and one rule in `engine.ts`: **add-only, capped at +15, never lowers a score**, so a prompt-injected invoice can't talk its way down.
+  `RiskPanel` already renders reasons generically, so no UI change is needed. I'll check the legit sample still scores 0.
 
 ---
 
