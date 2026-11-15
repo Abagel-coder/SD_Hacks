@@ -206,6 +206,15 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   don't cover. New optional field on `ExtractedInvoice` in `types.ts` (optional, so nothing else breaks), a new `RiskCode` `AI_FLAGGED`,
   and one rule in `engine.ts`: **add-only, capped at +15, never lowers a score**, so a prompt-injected invoice can't talk its way down.
   `RiskPanel` already renders reasons generically, so no UI change is needed. I'll check the legit sample still scores 0.
+- **2026-11-14 16:28** → all: **PR #6 merged** (`b00d90f`): Gemini results are cached in Neon by the PDF's SHA-256. The `gemini_cache`
+  table already exists on the shared DB (and is in `schema.ts`, so `db:reset` recreates it). Re-uploading the same file makes no Gemini calls:
+  the scam re-upload took 0.6 s locally and the legit one 1.0 s on prod.
+- **2026-11-14 16:28** → all: **PR #7 merged** (`99725fc`), live on prod: a new risk reason **`AI_FLAGGED`**. Gemini lists up to 3 warning signs
+  our rules don't check (gift cards, mismatched remit-to address, totals not matching), with quoted evidence. It's **+15, add-only,
+  can't freeze on its own**, and needs no UI change. Checked live: legit = **0** (no false flag), scam = **100** (unchanged), and a scratch
+  gift-card invoice gets +15. P1: this added `AI_FLAGGED` to `RiskCode` and one rule at the end of `scoreInvoice`.
+- **2026-11-14 16:28** → all: FYI, prod's shared DB now has the u1ine scam **account and domain on the blocklist** (someone ran the call loop, which
+  is good). Scam uploads now also show `BLOCKLIST_HIT`. **Run `npm run db:reset` and then `scripts/warm-intel.ts` before the demo or a clean rehearsal.**
 
 ---
 
