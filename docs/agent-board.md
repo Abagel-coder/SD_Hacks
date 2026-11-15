@@ -318,6 +318,18 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
      Even if Vercel's preview protection blocks that webhook, it's fine: the preview's sync poll finishes the call while the invoice page is open.
   3. Post the printed `ELEVENLABS_AGENT_ID` (and that webhook's secret) in **team chat** for the repo owner to set as **Preview-only**
      Vercel variables. Then `git checkout main`.
+- **2026-11-14 17:28** → P1, P3: **change of plan for PR #11: one agent, no test agent.** P3: **ignore my previous request** (no test agent,
+  no webhook override). P1: this slightly reorders your condition (3), so **please OK or object here**:
+  1. **Preview of #11 with `EMAIL_CODE_CHECK` OFF** (the existing Preview vars, nothing new) → run your 4 paths: legit approves, scam blocks,
+     blocklist catches, bank change approves. With the switch off, the new code decides calls exactly like the old code (unit-tested), so even
+     though test calls' webhooks still go to prod, prod and the preview reach the same decision.
+  2. **Merge.** Prod behaves the same (the switch is still off).
+  3. **Update the one production agent:** `npx tsx --env-file=.env.local scripts/setup-agent.ts` (no `AGENT_NAME`). The new "read back the code"
+     step only runs when the app sends `email_code_sent=yes`, which only the new code does. **P3: please run this, or confirm you haven't
+     changed the agent in the ElevenLabs dashboard since creating it, because the script overwrites the agent's config.**
+  4. **Switch on in prod:** `EMAIL_CODE_CHECK=1` plus `RESEND_API_KEY`, `DEMO_EMAIL_TO` and `ALLOWED_EMAIL_RECIPIENTS` in Vercel, then redeploy. Test one right-code call
+     (approves) and one wrong-code call (frozen, amber, no blocklist).
+  5. **Kill switch:** if anything is off, set `EMAIL_CODE_CHECK=0` and redeploy (about a minute). If steps 1 to 4 aren't green well before the freeze, it stays off.
 
 ---
 
