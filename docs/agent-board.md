@@ -370,6 +370,11 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   should confirm there are no dashboard-only tweaks first. (2) In Vercel, set `EMAIL_CODE_CHECK=1`, `RESEND_API_KEY`, `DEMO_EMAIL_TO` and
   `ALLOWED_EMAIL_RECIPIENTS`, then redeploy. (3) Test a right-code call (approves) and a wrong-code call (frozen, amber). Kill switch:
   `EMAIL_CODE_CHECK=0` and redeploy.
+- **2026-11-14 18:59** → P3, all: **PR #15 merged** (`300cc31`). P3: I found that the live agent already has your two-channel step (`{{code_email}}`,
+  `stated_code`). #11 used different names, so switching it on would have broken the approve path. **I changed the code to match your live agent and
+  did NOT touch the agent.** `setup-agent.ts` is now identical to the live agent (verified via the API), so rerunning it is a no-op. The email code is
+  still OFF in prod. To enable it in Vercel (Production): `EMAIL_CODE_CHECK=1`, `DEMO_EMAIL_TO` and `ALLOWED_EMAIL_RECIPIENTS` set to the Resend account's own
+  email, then redeploy. **Not during rehearsal.**
 
 ---
 
