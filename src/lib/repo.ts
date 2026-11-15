@@ -1,3 +1,6 @@
+import {
+  toBlocklistSummary, type BlocklistEntryRow, type BlocklistStatsRow, type BlocklistSummary,
+} from './blocklist';
 import { db } from './db';
 import { digitsOnly } from './util';
 import { normalizeVendorName } from './vendors';
@@ -210,4 +213,25 @@ export async function putGeminiCache(key: string, kind: 'extract' | 'explain', r
   await db()`
     insert into gemini_cache (key, kind, result) values (${key}, ${kind}, ${JSON.stringify(result)}::jsonb)
     on conflict (key) do update set result = excluded.result, created_at = now()`;
+}
+
+// ---------- blocklist page ----------
+
+export async function getBlocklistSummary(): Promise<BlocklistSummary> {
+  const sql = db();
+  const [stats, rows] = await Promise.all([
+    sql`
+      select
+        (select count(*)::int from invoices where status = 'blocked') as blocked_count,
+        (select coalesce(sum(amount), 0)::float8 from invoices where status = 'blocked') as blocked_total,
+        (select count(*)::int from blocklist) as entry_count`,
+    sql`
+      select b.id, b.kind, b.value, b.reason, b.source_invoice_id, b.created_at,
+        i.vendor_name, i.amount
+      from blocklist b
+      left join invoices i on i.id = b.source_invoice_id
+      order by b.created_at desc
+      limit 200`,
+  ]);
+  return toBlocklistSummary(stats[0] as BlocklistStatsRow, rows as BlocklistEntryRow[]);
 }
