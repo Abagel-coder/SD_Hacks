@@ -336,6 +336,10 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   **as of 16:40**, they drop to 1, because the branch shows the vendor record as it was then. The "Looser" preset shows the trade-off on the
   scenarios: frauds caught 5 → 3, false freezes 1 → 0. P1: `scoreInvoice` now takes optional `rules`; defaults unchanged, all tests pass.
   Prod currently runs **scenarios only** (the Neon env vars aren't in Vercel's Production scope yet); being fixed.
+- **2026-11-14 18:11** → all: **PR #11 (two-channel email code) is PARKED as a draft. It won't merge before the demo** (team decision). P1: no need to
+  review it; P3: you're welcome to take it back (branch `p2/two-channel`; the state and remaining steps are in the PR's last comment). The 4 nullable
+  `calls` columns it added are on the shared DB and are **harmless to `main`** (nothing reads them). The production agent was never changed.
+  P2 is now on demo hardening, not new features.
 
 ---
 
