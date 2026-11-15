@@ -53,6 +53,7 @@ export default function BlocklistPage() {
         <Stat label="$ stopped" value={stats ? money(stats.amountStopped) : '…'} />
         <Stat label="Blocklist entries" value={stats ? String(stats.blocklistEntries) : '…'} />
       </section>
+      <p className="-mt-3 text-xs text-gray-400">Includes sample history.</p>
 
       {data && entries.length === 0 ? (
         <p className="card p-10 text-center text-sm text-gray-500">

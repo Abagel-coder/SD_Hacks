@@ -61,6 +61,17 @@ export default function Home() {
               Vouch reads every invoice, fact-checks the vendor on the open web, freezes anything suspicious, and calls the
               real vendor before a cent moves.
             </p>
+            <p className="animate-fade-up mt-4 text-sm text-gray-400" style={{ animationDelay: '260ms' }}>
+              <span className="font-semibold text-white">$3B lost to business email scams in 2025</span> (FBI IC3){' '}
+              <a
+                href="https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-500 underline underline-offset-2 transition-colors hover:text-gray-300"
+              >
+                Source
+              </a>
+            </p>
             <div className="animate-fade-up mt-8 flex flex-wrap gap-3" style={{ animationDelay: '300ms' }}>
               <a href="#sign-in" className="btn group !bg-white !px-6 !py-3 !text-black hover:!bg-gray-100">
                 Get started <Arrow />
