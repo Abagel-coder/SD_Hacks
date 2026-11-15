@@ -11,16 +11,21 @@ The team is **not using Twilio**. Live verification is the ElevenLabs browser ca
 Rehearsals leave the scam bank account (`…6789`) and `u1ine.com` on the shared blocklist. If you skip
 this reset, the first on-stage scam upload shows **BLOCKLIST_HIT** instead of the clean freeze story.
 
-1. `npm run db:reset` (clears invoices, calls, and the blocklist).
+1. `npm run db:reset` (clears invoices, calls, blocklist, and `gemini_cache`).
 2. Warm the Bright Data intel cache (live only; refuses mock flags):
    `MOCK_GEMINI=0 MOCK_BRIGHTDATA=0 npx tsx --env-file=.env.local scripts/warm-intel.ts`
 3. Open the production URL. Confirm 18 approved invoices and an empty blocklist story.
-4. **Do not upload any scam invoice until you are on stage.** Legit uploads for a mic/UI check are fine;
-   save `samples/scam-uline.pdf` for the live demo.
-5. Laptop mic ready; allow microphone access when the browser asks. Vendor sits next to the laptop.
-6. `samples/legit-uline.pdf` and `samples/scam-uline.pdf` are on the desktop (optional approve-path:
+4. **Warm the Gemini cache for the legit PDF** (P1): upload `samples/legit-uline.pdf` once with sender
+   `billing@uline.com` and confirm **approved, risk 0**. Since `AI_FLAGGED` now freezes on its own and
+   `db:reset` empties `gemini_cache`, the first legit read after a reset is a fresh Gemini call. Caching a
+   known-good result here means the on-stage legit upload is instant and won't freeze on a rare false flag.
+   If this warm-up comes back flagged/frozen, reset + warm-intel and retry until it's approved 0.
+   Note: this leaves **one extra approved Uline** row in the list (19 total before the on-stage run).
+5. **Do not upload any scam invoice until you are on stage.** Save `samples/scam-uline.pdf` for the live demo.
+6. Laptop mic ready; allow microphone access when the browser asks. Vendor sits next to the laptop.
+7. `samples/legit-uline.pdf` and `samples/scam-uline.pdf` are on the desktop (optional approve-path:
    `samples/bank-change-uline.pdf` with sender `billing@uline.com` if you show a confirmed change).
-7. The backup video is open in a tab.
+8. The backup video is open in a tab.
 
 ## Script
 
@@ -32,9 +37,10 @@ this reset, the first on-stage scam upload shows **BLOCKLIST_HIT** instead of th
    "Gemini reads it. It matches Uline's history in Neon. Risk zero. Approved."
 3. **The scam (45 s).** Upload `scam-uline.pdf`, sender `billing@u1ine.com`.
    "Same supplier name. Our risk engine, which is our own code and not an LLM, compares it with
-   Uline's history: new bank account, three times the normal amount, pressure to pay today.
-   Bright Data checked the public web live: Uline's real site is uline.com, and this came from
-   u1ine.com with a number one. Score 100. The payment is frozen." Point at the Gemini explanation.
+   Uline's history: new bank account, three times the normal amount, pressure to pay today — or
+   Gemini flags a warning sign. Bright Data checked the public web live: Uline's real site is
+   uline.com, and this came from u1ine.com with a number one. Score 100. The payment is frozen."
+   Point at the Gemini explanation.
 4. **The call (60 s).** "Now the agent verifies, using the phone number Bright Data found on
    Uline's real website, never the number on the invoice — here as a live browser call through
    ElevenLabs." Click **Verify in browser**. Allow the mic. Vendor answers into the laptop:
@@ -62,8 +68,8 @@ this reset, the first on-stage scam upload shows **BLOCKLIST_HIT** instead of th
 
 ## Rehearsal checklist (run three times; once with every `MOCK_*` flag set to 1)
 
-- [ ] Pre-stage: `db:reset` + `warm-intel`; no scam upload until the timed run
-- [ ] Legit invoice: approved, risk 0
+- [ ] Pre-stage: `db:reset` + `warm-intel` + one legit warm-up upload (approved 0); no scam until the timed run
+- [ ] Legit invoice (on stage): approved, risk 0 (served from Gemini cache)
 - [ ] Scam invoice: frozen, risk 70 or more, at least three reasons, explanation shown (not only blocklist)
 - [ ] Public web check shows uline.com and "No" for the sender match
 - [ ] Browser call connects (or mock path completes) within 10 seconds of the click
