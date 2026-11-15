@@ -2,11 +2,12 @@ import {
   toBlocklistSummary, type BlocklistEntryRow, type BlocklistStatsRow, type BlocklistSummary,
 } from './blocklist';
 import { db } from './db';
+import { toVectorLiteral, type NearestBlocked } from './similar';
 import { digitsOnly } from './util';
 import { normalizeVendorName } from './vendors';
 import type {
   AuditRow, BlocklistHit, BlocklistKind, CallChannel, CallOutcome, CallRow, CallStatus,
-  ExtractedInvoice, InvoiceDetail, InvoiceRow, InvoiceStatus, RiskResult, TranscriptTurn,
+  ExtractedInvoice, InvoiceDetail, InvoiceRow, InvoiceStatus, RiskResult, SimilarScam, TranscriptTurn,
   VendorIntel, VendorRow,
 } from './types';
 
@@ -234,4 +235,34 @@ export async function getBlocklistSummary(): Promise<BlocklistSummary> {
       limit 200`,
   ]);
   return toBlocklistSummary(stats[0] as BlocklistStatsRow, rows as BlocklistEntryRow[]);
+}
+
+// ---------- similar-scam detection (pgvector) ----------
+
+export async function saveInvoiceEmbedding(invoiceId: string, embedding: number[]): Promise<void> {
+  await db()`
+    insert into invoice_embeddings (invoice_id, embedding)
+    values (${invoiceId}, ${toVectorLiteral(embedding)}::vector)
+    on conflict (invoice_id) do update set embedding = excluded.embedding, created_at = now()`;
+}
+
+/** The blocked invoice closest to this embedding by cosine distance, or null when none is blocked. */
+export async function findNearestBlocked(embedding: number[], excludeInvoiceId: string): Promise<NearestBlocked | null> {
+  const vector = toVectorLiteral(embedding);
+  const rows = await db()`
+    select i.id as "invoiceId", i.updated_at as "blockedAt",
+      1 - (e.embedding <=> ${vector}::vector) as similarity
+    from invoice_embeddings e
+    join invoices i on i.id = e.invoice_id
+    where i.status = 'blocked' and i.id <> ${excludeInvoiceId}
+    order by e.embedding <=> ${vector}::vector
+    limit 1`;
+  const row = rows[0] as { invoiceId: string; blockedAt: string | Date; similarity: unknown } | undefined;
+  if (!row) return null;
+  const blockedAt = row.blockedAt instanceof Date ? row.blockedAt.toISOString() : String(row.blockedAt);
+  return { invoiceId: row.invoiceId, blockedAt, similarity: row.similarity };
+}
+
+export async function saveSimilarScam(invoiceId: string, similar: SimilarScam): Promise<void> {
+  await db()`update invoices set similar_scam = ${JSON.stringify(similar)}::jsonb where id = ${invoiceId}`;
 }

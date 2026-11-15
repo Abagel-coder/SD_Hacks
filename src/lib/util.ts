@@ -1,4 +1,4 @@
-export function isMock(name: 'GEMINI' | 'BRIGHTDATA' | 'CALL'): boolean {
+export function isMock(name: 'GEMINI' | 'BRIGHTDATA' | 'CALL' | 'EMBEDDINGS'): boolean {
   return process.env[`MOCK_${name}`] === '1';
 }
 

@@ -1,11 +1,16 @@
 import { logAudit } from './audit';
 import { verifyVendor } from './brightdata/verify-vendor';
+import { embedText } from './embeddings';
 import { explainRisk } from './gemini/explain';
 import { extractInvoice } from './gemini/extract';
-import { findBlocklistHits, findVendorByName, insertInvoice, saveRisk, saveVendorIntel } from './repo';
+import {
+  findBlocklistHits, findNearestBlocked, findVendorByName, insertInvoice, saveInvoiceEmbedding, saveRisk,
+  saveSimilarScam, saveVendorIntel,
+} from './repo';
 import { normalizeDomain } from './risk/domains';
 import { scoreInvoice } from './risk/engine';
-import type { InvoiceRow, InvoiceStatus, RiskResult, VendorIntel } from './types';
+import { embeddingText, pickSimilarScam, SIMILAR_SCAM_THRESHOLD } from './similar';
+import type { InvoiceRow, InvoiceStatus, RiskResult, SimilarScam, VendorIntel } from './types';
 import { isMock, withTimeout } from './util';
 
 export function fallbackExplanation(risk: RiskResult): string {
@@ -22,12 +27,42 @@ function unavailableIntel(senderDomain: string | null): VendorIntel {
   };
 }
 
+/**
+ * Store this invoice's embedding and look for the closest blocked invoice. Evidence only: the result
+ * never changes the risk score. Fails open: any error just means no match.
+ */
+async function checkSimilarScam(
+  invoiceId: string, embedding: Promise<number[] | null>,
+): Promise<SimilarScam | null> {
+  try {
+    const vector = await embedding;
+    if (!vector) return null;
+    await saveInvoiceEmbedding(invoiceId, vector);
+    const nearest = await findNearestBlocked(vector, invoiceId);
+    const similar = pickSimilarScam(nearest);
+    if (!similar) return null;
+    await saveSimilarScam(invoiceId, similar);
+    await logAudit(invoiceId, 'agent', 'similar_scam',
+      { threshold: SIMILAR_SCAM_THRESHOLD }, similar,
+      `Similar to a scam blocked on ${similar.blockedAt.slice(0, 10)} (${Math.round(similar.similarity * 100)}% match). Shown as evidence; the risk score is unchanged.`);
+    return similar;
+  } catch (err) {
+    console.error('similar-scam check failed', err);
+    return null;
+  }
+}
+
 export async function processInvoice(input: {
   bytes: Buffer; mimeType: string; fileName: string; senderEmail?: string;
 }): Promise<InvoiceRow> {
   // 1. Read the invoice. If this throws, nothing has been saved.
   const extracted = await extractInvoice({ bytes: input.bytes, mimeType: input.mimeType }, input.senderEmail);
   const senderDomain = normalizeDomain(extracted.senderDomain ?? extracted.senderEmail ?? input.senderEmail);
+  // Embed in parallel with the vendor check. 5 s budget; a failure only means no similar-scam evidence.
+  const embedding = withTimeout(embedText(embeddingText(extracted, senderDomain)), 5_000).catch((err) => {
+    console.error('embedText failed', err);
+    return null;
+  });
 
   // 2. Match the vendor and save the invoice as pending.
   const vendor = await findVendorByName(extracted.vendorName);
@@ -72,7 +107,10 @@ export async function processInvoice(input: {
     explanation = fallbackExplanation(risk);
   }
 
-  // 6. Freeze or approve.
+  // 6. Similar-scam evidence (pgvector). Does not change the score or the decision.
+  await checkSimilarScam(invoice.id, embedding);
+
+  // 7. Freeze or approve.
   const status: InvoiceStatus = risk.freeze ? 'frozen' : 'approved';
   const saved = await saveRisk(invoice.id, { risk, explanation, intel, status });
   await logAudit(invoice.id, 'agent', status === 'frozen' ? 'freeze_payment' : 'approve_payment',

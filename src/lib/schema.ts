@@ -1,5 +1,19 @@
 export const DROP_STATEMENTS: string[] = [
-  'drop table if exists gemini_cache, blocklist, audit_log, calls, invoices, vendors cascade',
+  'drop table if exists invoice_embeddings, gemini_cache, blocklist, audit_log, calls, invoices, vendors cascade',
+];
+
+/**
+ * P1: similar-scam detection. Idempotent, so `npm run db:migrate` can apply it to the live shared DB
+ * without a reset. Embeddings live in their own table so `select * from invoices` stays small.
+ */
+export const PGVECTOR_STATEMENTS: string[] = [
+  'create extension if not exists vector',
+  `create table if not exists invoice_embeddings (
+    invoice_id uuid primary key references invoices(id) on delete cascade,
+    embedding vector(768) not null,
+    created_at timestamptz not null default now()
+  )`,
+  'alter table invoices add column if not exists similar_scam jsonb',
 ];
 
 export const SCHEMA_STATEMENTS: string[] = [
@@ -84,4 +98,5 @@ export const SCHEMA_STATEMENTS: string[] = [
     result jsonb not null,
     created_at timestamptz not null default now()
   )`,
+  ...PGVECTOR_STATEMENTS,
 ];

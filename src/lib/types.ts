@@ -115,6 +115,17 @@ export interface InvoiceRow {
   status: InvoiceStatus;
   created_at: string;
   updated_at: string;
+  /** P1: closest blocked invoice by embedding, when above the threshold. Evidence only; never scored. */
+  similar_scam?: SimilarScam | null;
+}
+
+/** Stored in invoices.similar_scam. */
+export interface SimilarScam {
+  invoiceId: string;
+  /** Cosine similarity, 0 to 1. Show as a percentage. */
+  similarity: number;
+  /** When the matched invoice was blocked (its updated_at). */
+  blockedAt: string;
 }
 
 export interface TranscriptTurn {
