@@ -35,12 +35,12 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
     return () => clearInterval(timer);
   }, [verifying, callId, onChange]);
 
-  async function verify(channel: 'phone' | 'browser') {
+  async function verifyInBrowser() {
     setBusy(true);
     setError(null);
     try {
       const res = await fetch(`/api/invoices/${invoice.id}/verify`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ channel }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ channel: 'browser' }),
       });
       if (!res.ok) {
         const json = (await res.json().catch(() => ({}))) as { error?: string };
@@ -55,22 +55,18 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
   }
 
   return (
-    <section className="rounded-lg border bg-white p-4">
-      <h2 className="font-semibold">Phone verification</h2>
+    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
+      <h2 className="font-semibold">Vendor verification</h2>
 
       {invoice.status === 'frozen' && (
         <div className="mt-2 space-y-2">
           <p className="text-sm text-gray-700">
-            The agent calls the vendor&apos;s publicly listed number, never the one printed on the invoice.
+            The agent verifies with the vendor over a browser call, using the publicly listed number for context — never the one printed on the invoice.
           </p>
           <div className="flex flex-wrap gap-2">
-            <button onClick={() => verify('phone')} disabled={busy}
+            <button onClick={() => void verifyInBrowser()} disabled={busy}
               className="rounded bg-blue-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
-              {busy ? 'Starting…' : 'Verify by phone'}
-            </button>
-            <button onClick={() => verify('browser')} disabled={busy}
-              className="rounded border px-4 py-2 text-sm disabled:opacity-50">
-              Verify in browser
+              {busy ? 'Starting…' : 'Verify in browser'}
             </button>
           </div>
           {call?.status === 'failed' && (
