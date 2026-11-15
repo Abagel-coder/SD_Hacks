@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #efe4d4; /* light brown page */
-  --foreground: #2b1f15;
+  --background: #f6f6f6; /* soft gray page so white cards stand out */
+  --foreground: #0a0a0a;
 }
 
 @theme inline {
@@ -12,24 +12,24 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Light brown theme: every gray utility (text, borders, panels) becomes a warm brown, and white cards
-   become cream. Status colours (amber, red, green, blue) are untouched so their meaning stays. */
+/* Monochrome theme: neutral grays and pure white cards, so the status colours (amber, blue, red, green)
+   are the only colour on the page and carry all the meaning. */
 @theme {
-  --color-white: #fffaf4;
-  --color-gray-50: #faf5ee;
-  --color-gray-100: #f3eadd;
-  --color-gray-200: #e6d7c3;
-  --color-gray-300: #d3bea1;
-  --color-gray-400: #b0977a;
-  --color-gray-500: #846a4f;
-  --color-gray-600: #6b543d;
-  --color-gray-700: #54412e;
-  --color-gray-800: #3d2e20;
-  --color-gray-900: #2b1f15;
-  --color-gray-950: #1c140d;
+  --color-white: #ffffff;
+  --color-gray-50: #f7f7f7;
+  --color-gray-100: #efefef;
+  --color-gray-200: #e3e3e3;
+  --color-gray-300: #cfcfcf;
+  --color-gray-400: #a3a3a3;
+  --color-gray-500: #737373;
+  --color-gray-600: #545454;
+  --color-gray-700: #3d3d3d;
+  --color-gray-800: #262626;
+  --color-gray-900: #141414;
+  --color-gray-950: #000000;
 }
 
-/* Invoice Guard is a light-theme dashboard; ignore OS dark preference so
+/* Vouch is a light-theme dashboard; ignore OS dark preference so
    white cards (upload form, panels) keep readable dark text. */
 :root {
   color-scheme: light;
@@ -38,5 +38,217 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.005em;
+}
+
+/* Shared surfaces: a white card, the small uppercase label above a section, and the black pill button. */
+@utility card {
+  border-radius: 1.25rem;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.05), 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -12px rgb(0 0 0 / 0.08);
+}
+
+@utility eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-gray-500);
+}
+
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background: #000000;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.7rem 1.4rem;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 150ms, transform 150ms, box-shadow 200ms;
+  &:hover { background: #262626; box-shadow: 0 8px 20px -8px rgb(0 0 0 / 0.45); transform: translateY(-1px); }
+  &:active { transform: scale(0.97); }
+  /* A light sweep across the button on hover. */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.28), transparent);
+    transform: translateX(-120%) skewX(-20deg);
+    pointer-events: none;
+  }
+  &:hover::after { animation: shine 0.8s ease-out; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+@utility btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  background: var(--color-gray-100);
+  color: var(--color-gray-900);
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0.45rem 1rem;
+  transition: background-color 150ms;
+  &:hover { background: var(--color-gray-200); }
+}
+
+@utility field {
+  border-radius: 0.75rem;
+  background: var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
+  padding: 0.6rem 0.85rem;
+  font-size: 0.875rem;
+  color: var(--color-gray-900);
+  outline: none;
+  transition: border-color 150ms, background-color 150ms;
+  &:focus { border-color: #000000; background: #ffffff; }
+  &::placeholder { color: var(--color-gray-400); }
+}
+
+/* Motion. Everything below is decoration and switches off for people who ask for reduced motion. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes shine {
+  from { transform: translateX(-120%) skewX(-20deg); }
+  to { transform: translateX(260%) skewX(-20deg); }
+}
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(6%, -8%) scale(1.08); }
+  66% { transform: translate(-5%, 6%) scale(0.95); }
+}
+@keyframes scan {
+  0% { top: 0%; opacity: 0; }
+  10%, 90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes ring-pulse {
+  0% { box-shadow: 0 0 0 0 rgb(220 38 38 / 0.45); }
+  100% { box-shadow: 0 0 0 14px rgb(220 38 38 / 0); }
+}
+
+@utility animate-fade-up {
+  animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@utility animate-page {
+  animation: fade-in 0.35s ease-out both;
+}
+@utility animate-drift {
+  animation: drift 14s ease-in-out infinite;
+}
+@utility animate-scan {
+  animation: scan 2.4s ease-in-out infinite;
+}
+@utility animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+@utility animate-ring-pulse {
+  animation: ring-pulse 1.4s ease-out infinite;
+}
+
+/* Cards that respond to the pointer: lift slightly and deepen the shadow. */
+@utility card-hover {
+  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 250ms;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.06), 0 2px 4px rgb(0 0 0 / 0.04), 0 20px 40px -16px rgb(0 0 0 / 0.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+@utility animate-wave {
+  animation: wave 0.9s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Soft light at the top of every page. */
+body {
+  background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgb(0 0 0 / 0.045), transparent 70%);
+  background-attachment: fixed;
+}
+::selection { background: #000000; color: #ffffff; }
+:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }
+
+/* A glow that follows the pointer across a card; the Spotlight component sets --x and --y. */
+@utility spotlight {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(320px circle at var(--x, 50%) var(--y, 50%), rgb(0 0 0 / 0.06), transparent 60%);
+    opacity: 0;
+    transition: opacity 300ms;
+    pointer-events: none;
+    z-index: -1;
+  }
+  &:hover::before { opacity: 1; }
+}
+@utility spotlight-dark {
+  &::before { background: radial-gradient(320px circle at var(--x, 50%) var(--y, 50%), rgb(255 255 255 / 0.14), transparent 60%); z-index: 0; }
+}
+
+/* Scroll reveal: the Reveal component adds .is-visible once the element enters the viewport. */
+@utility reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1), transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  &.is-visible { opacity: 1; transform: none; }
+}
+
+@keyframes ripple {
+  0% { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+@utility animate-ripple {
+  animation: ripple 2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+@keyframes dash {
+  to { stroke-dashoffset: -24; }
+}
+@utility animate-dash {
+  animation: dash 1s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
+}
+
+html { scroll-behavior: smooth; }
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+@utility animate-shimmer {
+  animation: shimmer 6s linear infinite, fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

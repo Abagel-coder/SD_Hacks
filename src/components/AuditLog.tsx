@@ -3,13 +3,13 @@ import type { AuditRow } from '@/lib/types';
 
 export function AuditLog({ rows }: { rows: AuditRow[] }) {
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Audit log</h2>
+    <section className="card p-6 text-gray-900">
+      <h2 className="eyebrow">Audit log</h2>
       <ol className="mt-2 space-y-2 text-sm">
         {rows.map((row) => (
           <li key={row.id}>
             <details>
-              <summary className="cursor-pointer">
+              <summary className="-mx-2 cursor-pointer rounded-lg px-2 py-1 transition-colors hover:bg-gray-50">
                 <span className="tabular-nums text-gray-500">{clock(row.created_at)}</span>{' '}
                 <span className="rounded bg-gray-100 px-1 text-xs">{row.actor}</span>{' '}
                 <span className="font-medium">{row.action.replaceAll('_', ' ')}</span>

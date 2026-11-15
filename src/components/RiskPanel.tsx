@@ -35,13 +35,13 @@ function Explanation({ text }: { text: string }) {
   }, [open, text]);
 
   return (
-    <div className="mt-4 rounded-md bg-gray-50 p-3 text-sm leading-relaxed text-gray-800">
+    <div className="mt-4 rounded-2xl bg-gray-50 p-4 text-sm leading-relaxed text-gray-800">
       <p ref={ref} className={open ? '' : 'line-clamp-3'}>{text}</p>
       {(overflows || open) && (
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="mt-1 text-xs font-semibold text-blue-700 underline underline-offset-2"
+          className="mt-1 text-xs font-semibold text-gray-900 underline underline-offset-2"
         >
           {open ? 'Show less' : 'Show more'}
         </button>
@@ -58,13 +58,13 @@ export function RiskPanel({ invoice }: { invoice: InvoiceRow }) {
   const capped = reasons.reduce((sum, reason) => sum + reason.points, 0) > 100;
 
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
+    <section className="card p-6 text-gray-900">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">
+          <h2 className="eyebrow">
             {decided ? 'Risk score at upload' : 'Risk score'}
           </h2>
-          <p className={`mt-1 text-4xl font-bold tabular-nums ${tone.text}`}>
+          <p className={`mt-2 text-5xl font-semibold tracking-tight tabular-nums ${tone.text}`}>
             {score}
             <span className="text-lg font-normal text-gray-500"> / 100</span>
             {capped && <span className="ml-2 text-xs font-normal text-gray-500">(capped at 100)</span>}
@@ -74,11 +74,11 @@ export function RiskPanel({ invoice }: { invoice: InvoiceRow }) {
       </div>
 
       <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100" aria-hidden>
-        <div className={`h-full rounded-full transition-all duration-500 ${tone.bar}`} style={{ width: `${Math.min(100, score)}%` }} />
+        <div className={`h-full rounded-full transition-all duration-1000 ease-out ${tone.bar}`} style={{ width: `${Math.min(100, score)}%` }} />
       </div>
 
       {invoice.similar_scam && (
-        <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-950">
+        <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-medium text-amber-950">
           ⚠ Similar to a scam blocked on {formatBlockedDate(invoice.similar_scam.blockedAt)}{' '}
           ({Math.round(invoice.similar_scam.similarity * 100)}% match).{' '}
           <Link
@@ -93,7 +93,7 @@ export function RiskPanel({ invoice }: { invoice: InvoiceRow }) {
       {reasons.length > 0 ? (
         <ul className="mt-4 space-y-3">
           {reasons.map((reason, index) => (
-            <li key={`${reason.code}-${index}`} className="rounded-md border border-gray-100 bg-gray-50 p-3">
+            <li key={`${reason.code}-${index}`} className="rounded-2xl bg-gray-50 p-4 transition-colors duration-200 hover:bg-gray-100">
               <div className="flex items-baseline justify-between gap-3">
                 <p className="text-sm font-semibold text-gray-900">
                   {REASON_TITLE[reason.code] ?? reason.code.replaceAll('_', ' ')}

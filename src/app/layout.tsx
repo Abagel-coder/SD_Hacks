@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Invoice Guard",
-  description: "A finance agent that stops invoice fraud for small businesses.",
+  title: "Vouch",
+  description: "Vouch checks every invoice and calls the vendor before a bank change gets paid.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

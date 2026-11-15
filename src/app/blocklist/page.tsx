@@ -22,8 +22,8 @@ const KIND_LABEL: Record<BlocklistKind, string> = {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
-      <p className="text-xs uppercase tracking-wide text-gray-600">{label}</p>
+    <div className="card p-6">
+      <p className="text-xs font-medium text-gray-500">{label}</p>
       <p className="mt-1 text-2xl font-bold tabular-nums text-gray-900">{value}</p>
     </div>
   );
@@ -35,11 +35,11 @@ export default function BlocklistPage() {
   const entries = data?.entries ?? [];
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-6 p-6 text-gray-900">
+    <main className="mx-auto w-full max-w-[110rem] space-y-6 px-4 py-6 text-gray-900 sm:px-6 lg:px-8">
       <AppNav current="blocklist" />
 
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Blocklist</h1>
+        <h1 className="text-4xl font-semibold tracking-tight">Blocklist</h1>
         <p className="text-sm text-gray-600">
           Bank accounts and domains from invoices the vendor denied. Any new invoice that uses one of
           them is frozen automatically.
@@ -55,7 +55,7 @@ export default function BlocklistPage() {
       </section>
 
       {data && entries.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-600">
+        <p className="card p-10 text-center text-sm text-gray-500">
           Nothing blocked yet. When a vendor denies a bank change on a verification call, the account and sender
           domain land here.
         </p>

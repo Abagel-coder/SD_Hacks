@@ -28,7 +28,7 @@ function domainAge(days: number): string {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between gap-4 border-b border-gray-200 py-1 last:border-b-0">
+    <div className="flex justify-between gap-4 -mx-2 rounded-lg border-b border-gray-100 px-2 py-2 transition-colors last:border-b-0 hover:bg-gray-50">
       <dt className="text-gray-600">{label}</dt>
       <dd className="text-right font-medium">{value}</dd>
     </div>
@@ -40,10 +40,10 @@ export function VendorCheck({ invoice }: { invoice: InvoiceRow }) {
   const phoneOnInvoice = invoice.extracted?.phoneOnInvoice;
   const sources = intel ? uniqueByHost(intel.sources).slice(0, 3) : [];
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
+    <section className="card p-6 text-gray-900">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Public web check</h2>
-        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+        <h2 className="eyebrow">Public web check</h2>
+        <span className="rounded-full bg-black px-2.5 py-1 text-xs font-medium text-white">
           Looked up live with Bright Data
         </span>
       </div>

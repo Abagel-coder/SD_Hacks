@@ -21,14 +21,17 @@ export function AlertBanner({ invoices }: { invoices: InvoiceRow[] }) {
   const blocked = invoices.filter((invoice) => invoice.status === 'blocked');
   if (blocked.length === 0) return null;
   return (
-    <div role="alert" className="space-y-1 rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-900">
-      {groupAlerts(blocked).map(({ latest, count }) => (
-        <p key={latest.id}>
-          <strong>Payment blocked:</strong> {money(latest.amount, latest.currency)} to {latest.vendor_name}
-          {count > 1 ? ` (×${count})` : ''}. The vendor did not confirm the bank change.{' '}
-          <Link href={`/invoices/${latest.id}`} className="font-semibold underline">Read the call transcript</Link>
-        </p>
-      ))}
+    <div role="alert" className="flex gap-4 rounded-[1.25rem] bg-red-600 p-5 text-sm text-white shadow-lg shadow-red-600/20">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/20 text-lg font-bold" aria-hidden>!</span>
+      <div className="space-y-1">
+        {groupAlerts(blocked).map(({ latest, count }) => (
+          <p key={latest.id}>
+            <strong>Payment blocked:</strong> {money(latest.amount, latest.currency)} to {latest.vendor_name}
+            {count > 1 ? ` (×${count})` : ''}. The vendor did not confirm the bank change.{' '}
+            <Link href={`/invoices/${latest.id}`} className="font-semibold underline underline-offset-2">Read the call transcript</Link>
+          </p>
+        ))}
+      </div>
     </div>
   );
 }

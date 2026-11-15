@@ -1,16 +1,18 @@
 import Link from 'next/link';
+import { AccountChip } from '@/components/AccountChip';
+import { Logo } from '@/components/Logo';
 
-export function AppNav({ current }: { current: 'invoices' | 'blocklist' | 'backtest' }) {
-  const link = (href: string, id: 'invoices' | 'blocklist' | 'backtest', label: string) => {
+type Page = 'home' | 'invoices' | 'blocklist' | 'backtest';
+
+export function AppNav({ current }: { current: Page }) {
+  const link = (href: string, id: Page, label: string) => {
     const active = current === id;
     return (
       <Link
         href={href}
-        className={
-          active
-            ? 'text-sm font-semibold text-gray-900 underline decoration-2 underline-offset-4'
-            : 'text-sm text-gray-600 hover:text-gray-900 hover:underline underline-offset-4'
-        }
+        className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
+          active ? 'bg-white text-black shadow-sm' : 'text-gray-300 hover:bg-white/10 hover:text-white'
+        }`}
       >
         {label}
       </Link>
@@ -18,17 +20,18 @@ export function AppNav({ current }: { current: 'invoices' | 'blocklist' | 'backt
   };
 
   return (
-    <nav className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 pb-4">
-      <div>
-        <Link href="/" className="text-lg font-bold tracking-tight text-gray-900">
-          Invoice Guard
-        </Link>
-        <p className="text-xs text-gray-600">Check every invoice before it is paid</p>
-      </div>
-      <div className="flex items-center gap-4">
-        {link('/', 'invoices', 'Invoices')}
+    <nav className="sticky top-3 z-50 flex flex-wrap items-center justify-between gap-3 rounded-full bg-black/90 py-2 pl-5 pr-2 text-white shadow-lg shadow-black/15 ring-1 ring-white/10 backdrop-blur-md">
+      <Link href="/">
+        <Logo inverted />
+      </Link>
+      <div className="flex items-center gap-1">
+        {link('/', 'home', 'Home')}
+        {link('/invoices', 'invoices', 'Invoices')}
         {link('/blocklist', 'blocklist', 'Blocklist')}
         {link('/backtest', 'backtest', 'Backtest')}
+        <span className="ml-2 hidden sm:block">
+          <AccountChip kind="business" />
+        </span>
       </div>
     </nav>
   );
