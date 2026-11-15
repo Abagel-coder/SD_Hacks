@@ -28,7 +28,10 @@ export function AccountChip({ kind }: { kind: AccountKind }) {
         type="button"
         onClick={() => {
           signOut(kind);
-          router.push('/login');
+          // The business also drops the password session cookie; the server then sends it to /login.
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full load of a route handler, not a page
+          if (kind === 'business') window.location.assign('/api/auth/logout');
+          else router.push('/login');
         }}
         className="rounded-full px-2.5 py-1 text-xs text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
       >

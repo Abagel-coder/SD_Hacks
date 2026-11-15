@@ -1,4 +1,5 @@
 import { parseRulesOverride, runBacktest } from '@/lib/backtest/run';
+import { rateLimited } from '@/lib/rate-limit';
 import { DEFAULT_RULES } from '@/lib/risk/engine';
 
 export const maxDuration = 60;
@@ -13,6 +14,8 @@ export async function GET() {
 
 /** Body: { asOf?: ISO string, rules?: RulesOverride }. Forks a Neon branch, replays, deletes it. */
 export async function POST(req: Request) {
+  const limited = rateLimited(req, 'backtest');
+  if (limited) return limited;
   const body = (await req.json().catch(() => ({}))) as { asOf?: unknown; rules?: unknown };
   const asOf = typeof body.asOf === 'string' && body.asOf.trim() ? body.asOf.trim() : undefined;
   if (asOf && Number.isNaN(new Date(asOf).getTime())) {

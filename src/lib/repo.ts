@@ -204,6 +204,16 @@ export async function getCall(id: string): Promise<CallRow | null> {
   return (rows[0] as CallRow | undefined) ?? null;
 }
 
+/** The call still running for this invoice, if any (newest first). */
+export async function getActiveCallForInvoice(invoiceId: string): Promise<CallRow | null> {
+  if (!isUuid(invoiceId)) return null;
+  const rows = await db()`
+    select * from calls
+    where invoice_id = ${invoiceId} and status in ('initiated', 'in_progress')
+    order by started_at desc limit 1`;
+  return (rows[0] as CallRow | undefined) ?? null;
+}
+
 export async function getCallByConversationId(conversationId: string): Promise<CallRow | null> {
   const rows = await db()`select * from calls where conversation_id = ${conversationId} limit 1`;
   return (rows[0] as CallRow | undefined) ?? null;
