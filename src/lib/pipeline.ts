@@ -9,7 +9,7 @@ import {
 } from './repo';
 import { normalizeDomain } from './risk/domains';
 import { scoreInvoice } from './risk/engine';
-import { embeddingText, pickSimilarScam, SIMILAR_SCAM_THRESHOLD } from './similar';
+import { embeddingText, formatBlockedOn, pickSimilarScam, SIMILAR_SCAM_THRESHOLD } from './similar';
 import type { InvoiceRow, InvoiceStatus, RiskResult, SimilarScam, VendorIntel } from './types';
 import { isMock, withTimeout } from './util';
 
@@ -44,7 +44,7 @@ async function checkSimilarScam(
     await saveSimilarScam(invoiceId, similar);
     await logAudit(invoiceId, 'agent', 'similar_scam',
       { threshold: SIMILAR_SCAM_THRESHOLD }, similar,
-      `Similar to a scam blocked on ${similar.blockedAt.slice(0, 10)} (${Math.round(similar.similarity * 100)}% match). Shown as evidence; the risk score is unchanged.`);
+      `Similar to a scam blocked on ${formatBlockedOn(similar.blockedAt)} (${Math.round(similar.similarity * 100)}% match). Shown as evidence; the risk score is unchanged.`);
     return similar;
   } catch (err) {
     console.error('similar-scam check failed', err);

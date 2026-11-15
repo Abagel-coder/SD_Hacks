@@ -46,6 +46,16 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   return dot / Math.sqrt(na * nb);
 }
 
+/** The business's timezone (Harbor Coffee Roasters, San Diego), used for dates in audit text. */
+export const BUSINESS_TIME_ZONE = 'America/Los_Angeles';
+
+/** '2026-11-15T00:26:00Z' -> 'Nov 14' (Pacific). Falls back to the raw value if it isn't a date. */
+export function formatBlockedOn(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: BUSINESS_TIME_ZONE });
+}
+
 /** The closest blocked invoice, as returned by the pgvector query. */
 export interface NearestBlocked {
   invoiceId: string;

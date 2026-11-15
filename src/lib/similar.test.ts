@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { MOCK_EXTRACTED } from './mocks';
 import {
-  EMBEDDING_DIM, SIMILAR_SCAM_THRESHOLD, cosineSimilarity, embeddingText, mockEmbedding, pickSimilarScam,
+  EMBEDDING_DIM, SIMILAR_SCAM_THRESHOLD, cosineSimilarity, embeddingText, formatBlockedOn, mockEmbedding, pickSimilarScam,
   toVectorLiteral,
 } from './similar';
 
@@ -91,5 +91,17 @@ describe('mockEmbedding', () => {
     expect(mockEmbedding(scam)).toHaveLength(EMBEDDING_DIM);
     expect(cosineSimilarity(mockEmbedding(scam), mockEmbedding(scam))).toBeCloseTo(1);
     expect(cosineSimilarity(mockEmbedding(scam), mockEmbedding(legit))).toBeLessThan(SIMILAR_SCAM_THRESHOLD);
+  });
+});
+
+describe('formatBlockedOn', () => {
+  it('formats in Pacific time, not UTC', () => {
+    // 4:26 PM Nov 14 in San Diego is already Nov 15 in UTC.
+    expect(formatBlockedOn('2026-11-15T00:26:00Z')).toBe('Nov 14');
+    expect(formatBlockedOn('2026-11-14T16:26:00Z')).toBe('Nov 14');
+  });
+
+  it('returns the raw value when it is not a date', () => {
+    expect(formatBlockedOn('not a date')).toBe('not a date');
   });
 });

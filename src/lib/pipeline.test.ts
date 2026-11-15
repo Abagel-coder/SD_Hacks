@@ -109,6 +109,15 @@ describe('processInvoice similar-scam evidence', () => {
     expect(scoreSaved()).toEqual(baseline);
   });
 
+  it('writes the block date in Pacific time in the audit message', async () => {
+    vi.mocked(repo.findNearestBlocked).mockResolvedValue({
+      ...blocked, blockedAt: '2026-11-15T00:26:00Z', similarity: 0.95,
+    });
+    await processInvoice(input);
+    const call = vi.mocked(audit.logAudit).mock.calls.find((c) => c[2] === 'similar_scam');
+    expect(call?.[5]).toContain('Similar to a scam blocked on Nov 14 (95% match)');
+  });
+
   it('ignores a match below the threshold', async () => {
     vi.mocked(repo.findNearestBlocked).mockResolvedValue({ ...blocked, similarity: 0.5 });
     await processInvoice(input);
