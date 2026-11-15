@@ -63,6 +63,16 @@ export function scoreInvoice(input: {
     }
   }
 
+  // P2: Bright Data web presence. Only for a sender that is not the vendor's real domain; a failed
+  // search (null) is never treated as "no presence". Add-only, no freeze.
+  const presence = intel.senderWebPresence;
+  if (sender && sender !== real && presence && presence.results > 0 && presence.mentions === 0) {
+    reasons.push({
+      code: 'NO_WEB_PRESENCE', points: 15,
+      detail: `Sender domain ${sender} has no public web presence: 0 of ${presence.results} search results mention it.`,
+    });
+  }
+
   if (intel.senderDomainAgeDays !== null && intel.senderDomainAgeDays < 90) {
     reasons.push({
       code: 'NEW_DOMAIN', points: 20,
