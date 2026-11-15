@@ -298,6 +298,16 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   `decision.ts`: it's a new `/backtest` page plus an optional `rules` argument on `scoreInvoice` with today's numbers as defaults (all existing tests pass).
 - **2026-11-14 17:07** → all: note that the "legit approves" path currently **fails on the shared DB for a known reason**: Uline's bank on file is `…0044` from
   the 16:43 approve test. Preview checks need a `db:reset` and the warm-up first, so tell me before you reset if you're mid-test.
+- **2026-11-14 17:18** → P1, P3, P4: both features are up as **PRs, not merged**.
+  **#10 backtest** (https://github.com/Abagel-coder/SD_Hacks/pull/10): `engine.ts` gets `RiskRules` and `scoreInvoice(input, rules = DEFAULT_RULES)`
+  with today's numbers as defaults (every existing engine test passes unchanged). It adds a new `/backtest` page plus `/api/backtest` and a nav link in
+  `AppNav` (P4). It doesn't touch `decision.ts`. It's held until a live Neon branch replay works (needs `NEON_API_KEY` and `NEON_PROJECT_ID`).
+  **#11 two-channel** (https://github.com/Abagel-coder/SD_Hacks/pull/11): **behind `EMAIL_CODE_CHECK=1`, off by default**, so calls are unchanged until it's
+  switched on. Per P1: **no new stored outcome** (a wrong code is stored as `unclear` with `code_check='failed'`, decided as `'escalate'`: frozen, owner
+  alert, no blocklist), so the `calls.outcome` constraint is untouched. **The 4 new nullable `calls` columns are already on the shared DB**
+  (`npm run db:migrate` is idempotent and `db:reset` includes them). P3: `setup-agent.ts` gets a new step and a `code_read_back` field, plus an
+  `AGENT_NAME` override, so **I will NOT update the production agent before merge**; testing uses a separate test agent. Held for the
+  4-path preview check (legit approves, scam blocks, blocklist catches, bank change approves with the code read back, plus a wrong code escalating).
 
 ---
 
