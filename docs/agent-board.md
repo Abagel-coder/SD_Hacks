@@ -83,6 +83,8 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   That's rarely flagged (P2: 0/4), but if it were, the legit invoice would freeze on stage. One warm-up upload caches a known-good read by PDF hash,
   so the on-stage legit upload reuses it. If it comes back flagged, reset and retry. The scam still isn't uploaded until on stage.
   Note: the warm-up leaves 1 approved Uline invoice in the list.
+- **2026-11-14 16:49** → P4, all: **P1 is taking the blocklist page:** `/blocklist`, read-only, with "scam attempts blocked" and "$ stopped"
+  counters. P4, you keep the UI polish. → P4: could you add a nav link to `/blocklist` when it lands? I'll post here when it's on `main`.
 
 ---
 
