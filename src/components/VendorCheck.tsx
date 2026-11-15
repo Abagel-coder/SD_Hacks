@@ -34,6 +34,10 @@ export function VendorCheck({ invoice }: { invoice: InvoiceRow }) {
               value={intel.senderDomainMatches === null ? 'unknown' : intel.senderDomainMatches ? 'Yes' : 'No'} />
             <Row label="Sender domain age"
               value={intel.senderDomainAgeDays === null ? 'no registration record' : `${intel.senderDomainAgeDays} days`} />
+            {intel.senderWebPresence && (
+              <Row label="Sender domain on the web"
+                value={`mentioned in ${intel.senderWebPresence.mentions} of ${intel.senderWebPresence.results} search results`} />
+            )}
             <Row label="Official phone" value={intel.officialPhone ?? 'not found'} />
             <Row label="Public contact email" value={intel.publicEmail ?? 'not found'} />
             <Row label="Phone printed on invoice" value={invoice.extracted?.phoneOnInvoice ?? 'none'} />

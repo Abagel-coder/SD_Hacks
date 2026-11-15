@@ -14,7 +14,8 @@ export type RiskCode =
   | 'AMOUNT_ANOMALY'
   | 'URGENCY_OR_SECRECY'
   | 'UNKNOWN_VENDOR'
-  | 'AI_FLAGGED';
+  | 'AI_FLAGGED'
+  | 'NO_WEB_PRESENCE';
 
 /** What Gemini reads off the invoice. Stored in invoices.extracted. */
 export interface ExtractedInvoice {
@@ -50,6 +51,8 @@ export interface VendorIntel {
   senderDomainMatches: boolean | null;
   senderDomainAgeDays: number | null;
   sources: string[];
+  /** P2: exact-match Google search for the sender domain. null = not checked or the search failed. */
+  senderWebPresence?: { results: number; mentions: number } | null;
 }
 
 export interface RiskReason {

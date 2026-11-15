@@ -31,8 +31,9 @@ async function request(
 }
 
 // SERP normally answers in 1.5-4 s; a 10 s cap keeps a stalled search inside the pipeline's 25 s budget.
-export async function googleSearch(query: string): Promise<SerpResult[]> {
-  const url = `https://www.google.com/search?q=${encodeURIComponent(query)}&gl=us&hl=en&brd_json=1`;
+export async function googleSearch(query: string, opts: { noAutocorrect?: boolean } = {}): Promise<SerpResult[]> {
+  // nfpr=1 stops Google rewriting a near-miss domain (u1ine.com) into the real one, which Bright Data reports as a 502 redirect.
+  const url = `https://www.google.com/search?q=${encodeURIComponent(query)}&gl=us&hl=en${opts.noAutocorrect ? '&nfpr=1' : ''}&brd_json=1`;
   let parsed = JSON.parse(await request(process.env.BRIGHTDATA_SERP_ZONE, url, {}, 10_000));
   // Some zone settings wrap the result as { status_code, headers, body }.
   if (typeof parsed?.body === 'string') parsed = JSON.parse(parsed.body);

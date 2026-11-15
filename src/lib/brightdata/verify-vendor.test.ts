@@ -4,9 +4,11 @@ import type { VendorIntel } from '../types';
 
 vi.mock('./public-facts', () => ({ lookupPublicFacts: vi.fn() }));
 vi.mock('./domain-age', () => ({ lookupDomainAgeDays: vi.fn() }));
+vi.mock('./web-presence', () => ({ lookupWebPresence: vi.fn() }));
 
 const { lookupPublicFacts } = await import('./public-facts');
 const { lookupDomainAgeDays } = await import('./domain-age');
+const { lookupWebPresence } = await import('./web-presence');
 const { verifyVendor } = await import('./verify-vendor');
 
 const LIVE_FACTS = {
@@ -24,6 +26,7 @@ describe('verifyVendor cache', () => {
     vi.stubEnv('MOCK_BRIGHTDATA', '0');
     vi.mocked(lookupPublicFacts).mockResolvedValue(LIVE_FACTS);
     vi.mocked(lookupDomainAgeDays).mockResolvedValue(11305);
+    vi.mocked(lookupWebPresence).mockResolvedValue({ results: 9, mentions: 0 });
   });
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -63,4 +66,29 @@ describe('verifyVendor cache', () => {
     expect(lookupPublicFacts).toHaveBeenCalled();
     expect(lookupDomainAgeDays).toHaveBeenCalled();
   });
+
+  it('checks web presence for a sender that is not the vendor\'s domain, and caches it with the sender', async () => {
+    const intel = await verifyVendor('Uline', 'u1ine.com', cachedFor('uline.com', 11305));
+    expect(lookupWebPresence).toHaveBeenCalledWith('u1ine.com');
+    expect(intel.senderWebPresence).toEqual({ results: 9, mentions: 0 });
+
+    vi.mocked(lookupWebPresence).mockClear();
+    const again = await verifyVendor('Uline', 'u1ine.com', intel);
+    expect(lookupWebPresence).not.toHaveBeenCalled();
+    expect(again.senderWebPresence).toEqual({ results: 9, mentions: 0 });
+  });
+
+  it('skips the web-presence search when the sender is the vendor\'s known real domain', async () => {
+    const intel = await verifyVendor('Uline', 'uline.com', cachedFor('grainger.com', 11924));
+    expect(lookupWebPresence).not.toHaveBeenCalled();
+    expect(intel.senderWebPresence).toBeNull();
+  });
+
+  it('retries the web-presence search when the cached result is unknown (a failed search is not cached)', async () => {
+    const failedEarlier: VendorIntel = { ...cachedFor('u1ine.com', null), senderWebPresence: null };
+    const intel = await verifyVendor('Uline', 'u1ine.com', failedEarlier);
+    expect(lookupWebPresence).toHaveBeenCalledWith('u1ine.com');
+    expect(intel.senderWebPresence).toEqual({ results: 9, mentions: 0 });
+  });
 });
+
