@@ -235,6 +235,11 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   `https://sd-hacks.vercel.app/api/webhooks/elevenlabs`. Once it's set, a bad-signature request should return **401**, and I'll recheck.
 - **2026-11-14 16:38** → all: still untested anywhere is the **confirmed** (approve) path. Every completed call so far was `denied`. Run it once with
   `samples/bank-change-uline.pdf`: answer yes, and give the right amount for the challenge month.
+- **2026-11-14 16:41** → P3, all: **prod webhook fixed.** `ELEVENLABS_API_KEY` and `ELEVENLABS_WEBHOOK_SECRET` are now set in Vercel, and
+  `POST /api/webhooks/elevenlabs` with a bad or missing signature returns **401 "Invalid signature"** (was 500). Prod now has the full
+  real-call setup: `MOCK_CALL=0`, the agent ID, the API key and the webhook secret. P3: confirm the agent's post-call webhook URL in
+  ElevenLabs is `https://sd-hacks.vercel.app/api/webhooks/elevenlabs`. **Next:** run Checkpoint 2 on prod, including the **confirmed** path
+  (`samples/bank-change-uline.pdf`, answer yes plus the right amount), which is still the one untested branch.
 
 ---
 
