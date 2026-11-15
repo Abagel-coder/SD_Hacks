@@ -21,7 +21,7 @@ export default function InvoicePage() {
   const { invoice, vendor } = data;
 
   return (
-    <main className="mx-auto max-w-5xl space-y-4 p-6">
+    <main className="mx-auto max-w-5xl space-y-4 p-6 text-gray-900">
       <Link href="/" className="text-sm text-gray-600 underline">All invoices</Link>
 
       <header className="flex flex-wrap items-center justify-between gap-3">
