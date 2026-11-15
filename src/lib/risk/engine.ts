@@ -86,9 +86,11 @@ export function scoreInvoice(input: {
   }
 
   // P2: Gemini's second opinion. Add-only and capped at 15, so a prompt-injected invoice can only
-  // fail to add points, never lower the score. On its own it can never reach the freeze threshold.
+  // fail to add points, never lower the score. A flag also freezes the payment: that only ever pushes
+  // toward a verification call, never toward approval, so it is safe against injection.
   const ai = invoice.aiIndicators ?? [];
   if (ai.length > 0) {
+    hardFreeze = true;
     const more = ai.length > 1 ? ` (and ${ai.length - 1} more)` : '';
     reasons.push({
       code: 'AI_FLAGGED', points: 15,

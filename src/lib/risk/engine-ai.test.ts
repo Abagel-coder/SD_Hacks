@@ -45,11 +45,19 @@ describe('AI_FLAGGED (Gemini fraud indicators)', () => {
       .toBe('Gemini flagged: Unusual payment method: "Gift cards only".');
   });
 
-  it('can never lower a score, and does not freeze an invoice on its own', () => {
+  it('can never lower a score', () => {
     const flagged = score({ ...INVOICE, aiIndicators: [{ signal: 'x', evidence: 'y' }] });
     expect(flagged.score).toBeGreaterThanOrEqual(score(INVOICE).score);
+  });
+
+  it('freezes the invoice for phone verification even when the score stays under 50', () => {
+    const flagged = score({ ...INVOICE, aiIndicators: [{ signal: 'Unusual payment method', evidence: 'Gift cards only' }] });
     expect(flagged.score).toBeLessThan(50);
-    expect(flagged.freeze).toBe(false);
+    expect(flagged.freeze).toBe(true);
+  });
+
+  it('leaves an unflagged low-risk invoice approved', () => {
+    expect(score({ ...INVOICE, aiIndicators: [] }).freeze).toBe(false);
   });
 
   it('respects the 100 cap', () => {
