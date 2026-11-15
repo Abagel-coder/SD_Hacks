@@ -130,7 +130,7 @@ export async function getInvoiceDetail(id: string): Promise<InvoiceDetail | null
   ]);
   const latest = (calls[0] as CallRow | undefined) ?? null;
   // The expected challenge answer must never reach the browser.
-  const call = latest ? { ...latest, challenge_answer: null } : null;
+  const call = latest ? { ...latest, challenge_answer: null, email_code: null } : null;
   return { invoice, vendor, call, audit: audit as AuditRow[] };
 }
 
@@ -162,18 +162,22 @@ export async function addToBlocklist(
 export async function createCall(f: {
   invoiceId: string; channel: CallChannel; numberFound: string | null; numberDialed: string | null;
   challengeQuestion: string | null; challengeAnswer: string | null;
+  emailFound?: string | null; emailSentTo?: string | null; emailCode?: string | null;
+  codeCheck?: 'passed' | 'failed' | 'not_sent' | null;
 }): Promise<CallRow> {
   const rows = await db()`
-    insert into calls (invoice_id, channel, number_found, number_dialed, challenge_question, challenge_answer)
+    insert into calls (invoice_id, channel, number_found, number_dialed, challenge_question, challenge_answer,
+      email_found, email_sent_to, email_code, code_check)
     values (${f.invoiceId}, ${f.channel}, ${f.numberFound}, ${f.numberDialed},
-      ${f.challengeQuestion}, ${f.challengeAnswer})
+      ${f.challengeQuestion}, ${f.challengeAnswer},
+      ${f.emailFound ?? null}, ${f.emailSentTo ?? null}, ${f.emailCode ?? null}, ${f.codeCheck ?? null})
     returning *`;
   return rows[0] as CallRow;
 }
 
 export async function updateCall(id: string, p: {
   status?: CallStatus; outcome?: CallOutcome; conversationId?: string;
-  transcript?: TranscriptTurn[]; ended?: boolean;
+  transcript?: TranscriptTurn[]; ended?: boolean; codeCheck?: 'passed' | 'failed' | 'not_sent';
 }): Promise<void> {
   await db()`
     update calls set
@@ -181,6 +185,7 @@ export async function updateCall(id: string, p: {
       outcome = coalesce(${p.outcome ?? null}, outcome),
       conversation_id = coalesce(${p.conversationId ?? null}, conversation_id),
       transcript = coalesce(${p.transcript ? JSON.stringify(p.transcript) : null}::jsonb, transcript),
+      code_check = coalesce(${p.codeCheck ?? null}, code_check),
       ended_at = case when ${p.ended ?? false} then now() else ended_at end
     where id = ${id}`;
 }

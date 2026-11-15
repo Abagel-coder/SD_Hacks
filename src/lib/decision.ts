@@ -3,7 +3,7 @@ import { addToBlocklist, getInvoice, getVendor, setInvoiceStatus, updateVendorBa
 import { normalizeDomain } from './risk/domains';
 import type { CallOutcome, InvoiceStatus } from './types';
 
-export function decide(outcome: CallOutcome | 'failed'): {
+export function decide(outcome: CallOutcome | 'failed' | 'escalate'): {
   status: InvoiceStatus; saveBank: boolean; blocklist: boolean;
 } {
   switch (outcome) {
@@ -14,11 +14,15 @@ export function decide(outcome: CallOutcome | 'failed'): {
       return { status: 'blocked', saveBank: false, blocklist: true };
     case 'failed':
       return { status: 'frozen', saveBank: false, blocklist: false };
+    // P2 two-channel: said yes but could not read back the emailed code. Not proof of fraud
+    // (someone else may read that inbox), so hold the payment for the owner; blocklist nothing.
+    case 'escalate':
+      return { status: 'frozen', saveBank: false, blocklist: false };
   }
 }
 
 export async function applyDecision(
-  invoiceId: string, callId: string, outcome: CallOutcome | 'failed',
+  invoiceId: string, callId: string, outcome: CallOutcome | 'failed' | 'escalate',
 ): Promise<void> {
   const decision = decide(outcome);
   // Compare-and-set: only the first decision for a verifying invoice wins.
@@ -52,11 +56,19 @@ export async function applyDecision(
       'Payment blocked. Owner alerted with the call transcript.');
   }
 
-  const reasons: Record<CallOutcome | 'failed', string> = {
+  if (outcome === 'escalate') {
+    await logAudit(invoiceId, 'agent', 'owner_alert', { callId, outcome },
+      { status: decision.status, blocklisted: null },
+      'The person on the call said yes but could not read back the emailed code sent to the vendor\'s public address. ' +
+      'Payment stays frozen for the owner to check; nothing was blocklisted.');
+  }
+
+  const reasons: Record<CallOutcome | 'failed' | 'escalate', string> = {
     confirmed: 'Vendor confirmed the bank change and answered the history question correctly.',
     denied: 'Vendor said they did not request a bank change.',
     unclear: 'The call did not produce a clear, verified confirmation.',
     failed: 'The call could not be completed. Payment stays frozen until it is verified.',
+    escalate: 'Confirmed by phone but failed the emailed-code check, so it was escalated to the owner.',
   };
   await logAudit(invoiceId, 'agent', 'decision', { callId, outcome },
     { status: decision.status }, reasons[outcome]);

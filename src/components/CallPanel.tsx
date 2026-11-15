@@ -118,15 +118,29 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
         <p className="mt-1 text-xs text-gray-600">{historyQuestion}</p>
       )}
 
+      {call?.email_found && (
+        <p className="mt-1 text-xs text-gray-600">
+          {call.code_check === 'not_sent'
+            ? `Email code: not sent to ${call.email_found}.`
+            : `Email code sent to the vendor's public address ${call.email_found}` +
+              (call.email_sent_to && call.email_sent_to !== call.email_found.toLowerCase() ? ` (demo redirect: ${call.email_sent_to})` : '') +
+              (call.code_check === 'passed' ? '. Read back correctly.' : call.code_check === 'failed' ? '. Not read back correctly.' : '.')}
+        </p>
+      )}
+
       {call?.outcome && (
         <p
           className={`mt-3 rounded-md border p-3 text-base font-semibold ${
             call.outcome === 'confirmed'
               ? 'border-green-300 bg-green-50 text-green-800'
-              : 'border-red-300 bg-red-50 text-red-800'
+              : call.code_check === 'failed'
+                ? 'border-amber-300 bg-amber-50 text-amber-900'
+                : 'border-red-300 bg-red-50 text-red-800'
           }`}
         >
-          {OUTCOME_TEXT[call.outcome]}
+          {call.code_check === 'failed'
+            ? 'Said yes, but could not read back the emailed code. Escalated to the owner; the payment stays frozen.'
+            : OUTCOME_TEXT[call.outcome]}
         </p>
       )}
 

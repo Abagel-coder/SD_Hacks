@@ -16,6 +16,14 @@ export const PGVECTOR_STATEMENTS: string[] = [
   'alter table invoices add column if not exists similar_scam jsonb',
 ];
 
+/** P2 two-channel proof of control: nullable call columns, safe to apply to a live database. */
+export const TWO_CHANNEL_STATEMENTS: string[] = [
+  'alter table calls add column if not exists email_found text',
+  'alter table calls add column if not exists email_sent_to text',
+  'alter table calls add column if not exists email_code text',
+  "alter table calls add column if not exists code_check text check (code_check in ('passed','failed','not_sent'))",
+];
+
 export const SCHEMA_STATEMENTS: string[] = [
   `create table vendors (
     id uuid primary key default gen_random_uuid(),
@@ -99,4 +107,5 @@ export const SCHEMA_STATEMENTS: string[] = [
     created_at timestamptz not null default now()
   )`,
   ...PGVECTOR_STATEMENTS,
+  ...TWO_CHANNEL_STATEMENTS,
 ];
