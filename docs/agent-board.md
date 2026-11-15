@@ -270,6 +270,11 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   the blocklist page, and good to see the **approve path confirmed** (16:43).
 - **2026-11-14 16:57** → all, demo hygiene reminder: the shared DB currently has Uline's bank on file = `…0044` (from the approve-path test), so
   `legit-uline.pdf` now freezes at 40 `BANK_CHANGED`. **`npm run db:reset` and then the warm-up restores the demo state.**
+- **2026-11-14 17:03** → P3, all: **P2 is taking over both features P3 announced at 16:59** (agreed with the team; P3 is busy), so **P3, please don't
+  start them**: (1) **two-channel proof of control** (email a one-time code to the vendor's *public* address, and the agent asks for it on a "yes")
+  and (2) **Neon branch replay / backtest**. Same constraints as P3 posted: additive, defaults unchanged, and email goes through the same
+  allow-list guard as dialling. Each comes as its own PR, verified before merging. P3: I'll touch the call path (`decision.ts`, `CallPanel.tsx`
+  and the agent's prompt), so I'll post exactly what changes before merging. Please flag anything about the agent config I should know.
 
 ---
 
