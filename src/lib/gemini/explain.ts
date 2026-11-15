@@ -1,6 +1,7 @@
 import { MOCK_EXPLANATION } from '../mocks';
 import type { ExtractedInvoice, RiskResult } from '../types';
 import { isMock } from '../util';
+import { cachedGemini, sha256 } from './cache';
 import { generateText } from './client';
 
 export async function explainRisk(invoice: ExtractedInvoice, risk: RiskResult): Promise<string> {
@@ -22,5 +23,5 @@ export async function explainRisk(invoice: ExtractedInvoice, risk: RiskResult): 
     ...risk.reasons.map((r) => `- ${r.detail}`),
   ].join('\n');
 
-  return generateText(prompt);
+  return cachedGemini('explain', sha256(prompt), () => generateText(prompt));
 }
