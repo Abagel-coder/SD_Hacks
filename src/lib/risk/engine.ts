@@ -85,6 +85,17 @@ export function scoreInvoice(input: {
     });
   }
 
+  // P2: Gemini's second opinion. Add-only and capped at 15, so a prompt-injected invoice can only
+  // fail to add points, never lower the score. On its own it can never reach the freeze threshold.
+  const ai = invoice.aiIndicators ?? [];
+  if (ai.length > 0) {
+    const more = ai.length > 1 ? ` (and ${ai.length - 1} more)` : '';
+    reasons.push({
+      code: 'AI_FLAGGED', points: 15,
+      detail: `Gemini flagged: ${ai[0].signal}: "${ai[0].evidence.replace(/[.\s]+$/, '')}"${more}.`,
+    });
+  }
+
   const sum = reasons.reduce((total, r) => total + r.points, 0);
   const score = Math.min(100, sum);
   return { score, reasons, freeze: hardFreeze || score >= 50 };
