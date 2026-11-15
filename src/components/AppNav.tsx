@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
-export function AppNav({ current }: { current: 'invoices' | 'blocklist' }) {
-  const link = (href: string, id: 'invoices' | 'blocklist', label: string) => {
+export function AppNav({ current }: { current: 'invoices' | 'blocklist' | 'backtest' }) {
+  const link = (href: string, id: 'invoices' | 'blocklist' | 'backtest', label: string) => {
     const active = current === id;
     return (
       <Link
@@ -28,6 +28,7 @@ export function AppNav({ current }: { current: 'invoices' | 'blocklist' }) {
       <div className="flex items-center gap-4">
         {link('/', 'invoices', 'Invoices')}
         {link('/blocklist', 'blocklist', 'Blocklist')}
+        {link('/backtest', 'backtest', 'Backtest')}
       </div>
     </nav>
   );
