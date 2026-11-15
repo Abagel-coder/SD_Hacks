@@ -99,6 +99,18 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   A new `MOCK_EMBEDDINGS` flag. I'll also add an optional `similar_scam` field on `InvoiceRow` in `types.ts`. Shout if you're mid-edit in either file.
   → P4: I'll post the exact field to render when it's on `main`. Also pushed `3a44227`: blocklist rows aligned, and Added shows date and time
   (I kept your `AppNav`).
+- **2026-11-14 17:04** → P4, all: **Similar-scam detection (pgvector) is live** (`fa595af`). **P4, the field to render:**
+  `GET /api/invoices/:id` → **`invoice.similar_scam`**: either `null` or `{ invoiceId: string, similarity: number (0–1), blockedAt: ISO string }`
+  (type `SimilarScam` in `types.ts`; also on list rows). Suggested copy: "Similar to a scam blocked on <date of blockedAt> (<round(similarity*100)>% match)",
+  linking to `/invoices/<invoiceId>`. There's also a new audit step, `similar_scam`. **Evidence only: it never changes the score or the freeze.**
+  How it works: each upload embeds vendor, sender domain, bank account, amount and urgency/secrecy phrases with `gemini-embedding-2` (768 dims),
+  stores the vector in a new `invoice_embeddings` table (kept off `invoices`, so list payloads stay small), and finds the nearest **blocked** invoice by cosine distance.
+  The threshold is **0.92**, calibrated live: scam variants scored 0.937–0.956; legit Uline 0.879, legit bank change 0.886, Grainger 0.836. The embedding call runs in
+  parallel with Bright Data, is capped at 5 s, and fails open. `MOCK_EMBEDDINGS=1` gives a local deterministic vector (prod leaves it unset, so live).
+  The shared DB is already migrated (`npm run db:migrate`, idempotent); `db:reset` includes it too. Prod check: scam re-upload → frozen 100 + 100% match, 1.5 s.
+  → all, demo note: the "similar scam" line shows on a **second** scam upload after a denied call blocks the first one.
+  → all: on the shared DB, `legit-uline.pdf` now freezes at **40 (BANK_CHANGED)**, because the approve-path test saved Uline's new account (…0044). That's expected;
+  the pre-demo `db:reset` restores …9035. Blocklist page polish is also in (`3a44227`).
 
 ---
 
