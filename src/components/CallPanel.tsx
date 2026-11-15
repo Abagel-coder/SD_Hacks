@@ -11,7 +11,9 @@ const OUTCOME_TEXT: Record<CallOutcome, string> = {
 };
 
 function liveStatus(call: CallRow): string {
-  if (call.channel === 'browser') return 'Waiting for the browser call.';
+  if (call.channel === 'browser') {
+    return call.status === 'initiated' ? 'Ready: click Start browser call.' : 'On the verification call…';
+  }
   if (call.status === 'in_progress') return `On the call with ${call.number_dialed ?? 'the vendor'}…`;
   return `Calling ${call.number_dialed ?? 'the vendor'}…`;
 }
@@ -23,6 +25,11 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
   const verifying = invoice.status === 'verifying';
   const callId = call?.id ?? null;
   const blocklisted = (invoice.risk_reasons ?? []).some((reason) => reason.code === 'BLOCKLIST_HIT');
+  // Display only: the history question is shown during the call, and afterwards only when the vendor confirmed.
+  const callFinished = call ? call.outcome !== null || call.status === 'completed' || call.status === 'failed' : false;
+  const historyQuestion = call?.challenge_question && (!callFinished || call.outcome === 'confirmed')
+    ? `History question: ${call.challenge_question}`
+    : null;
 
   useEffect(() => {
     if (!verifying || !callId) return;
@@ -66,7 +73,7 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
       {invoice.status === 'frozen' && !blocklisted && (
         <div className="mt-3 space-y-2">
           <p className="text-sm leading-relaxed text-gray-700">
-            The agent verifies with the vendor over a browser call, using the publicly listed number for context — never the one printed on the invoice.
+            The agent checks with the vendor on a verification call, using the publicly listed number for context — never the one printed on the invoice.
           </p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => void verifyInBrowser()} disabled={busy}
@@ -107,20 +114,30 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
         </p>
       )}
 
-      {call?.challenge_question && (
-        <p className="mt-1 text-xs text-gray-600">History question: {call.challenge_question}</p>
+      {!call?.outcome && historyQuestion && (
+        <p className="mt-1 text-xs text-gray-600">{historyQuestion}</p>
       )}
 
       {call?.outcome && (
-        <p className={`mt-3 text-sm font-semibold ${call.outcome === 'confirmed' ? 'text-green-700' : 'text-red-700'}`}>
+        <p
+          className={`mt-3 rounded-md border p-3 text-base font-semibold ${
+            call.outcome === 'confirmed'
+              ? 'border-green-300 bg-green-50 text-green-800'
+              : 'border-red-300 bg-red-50 text-red-800'
+          }`}
+        >
           {OUTCOME_TEXT[call.outcome]}
         </p>
+      )}
+
+      {call?.outcome && historyQuestion && (
+        <p className="mt-2 text-xs text-gray-600">{historyQuestion}</p>
       )}
 
       {call?.transcript && call.transcript.length > 0 && (
         <div className="mt-4 space-y-2">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Call transcript</h3>
-          <ol className="max-h-80 space-y-2 overflow-y-auto rounded-lg border border-gray-100 bg-gray-50 p-3">
+          <ol className="space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
             {call.transcript.map((turn, index) => {
               const agent = turn.role === 'agent';
               return (
@@ -135,7 +152,7 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
                         : 'rounded-br-md bg-blue-700 text-white'
                     }`}
                   >
-                    <p className={`mb-0.5 text-[10px] font-semibold uppercase tracking-wide ${agent ? 'text-gray-500' : 'text-blue-100'}`}>
+                    <p className={`mb-0.5 text-xs font-semibold uppercase tracking-wide ${agent ? 'text-gray-500' : 'text-blue-100'}`}>
                       {agent ? 'Agent' : 'Vendor'}
                     </p>
                     <p>{turn.message}</p>
