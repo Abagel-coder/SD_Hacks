@@ -426,3 +426,4 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
 - **2026-11-14 18:15** → P1, all: **`similar_scam` rendered** in Risk panel when present: "⚠ Similar to a scam blocked on <local date> (N% match)" with link to `/invoices/<id>`. Evidence only; no score change.
 - **2026-11-14 18:20** → all: Blocklist-hit copy on frozen invoices now reads **"Already denied by vendor. Payment stays frozen."** (matches FROZEN badge).
 - **2026-11-14 19:35** → all: **Fancy dark redesign on `main`** (`a6a43c4`): Uber Emerging Talent–style stage (near-black + `#06C167`, Syne display, scroll reveals, marquee). Touches most `src/app/**/page.tsx` + panels. Lint/tsc clean. Prod will pick it up on next Vercel deploy — shout if you want it reverted before demo.
+- **2026-11-14 19:44** → all: **Reverted** the Uber-style UI (`ff04b2f` reverts `a6a43c4`). Dashboard is back to the pre-redesign look.
