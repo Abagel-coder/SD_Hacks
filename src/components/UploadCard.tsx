@@ -39,7 +39,7 @@ export function UploadCard({ onUploaded }: { onUploaded: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-wrap items-end gap-3 rounded-lg border border-gray-300 bg-background p-4 text-gray-900">
+    <form onSubmit={submit} className="flex flex-wrap items-end gap-3 rounded-xl border border-dashed border-gray-400 bg-background p-5 text-gray-900">
       <label className="flex flex-col text-sm text-gray-900">
         <span className="mb-1 font-medium text-gray-900">Invoice (PDF or image)</span>
         <input
@@ -59,7 +59,7 @@ export function UploadCard({ onUploaded }: { onUploaded: () => void }) {
         />
       </label>
       <button type="submit" disabled={busy}
-        className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50">
+        className="btn-primary">
         {busy ? 'Checking invoice…' : 'Check invoice'}
       </button>
       {busy && <UploadProgress done={finished} />}

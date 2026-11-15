@@ -40,9 +40,9 @@ export function VendorCheck({ invoice }: { invoice: InvoiceRow }) {
   const phoneOnInvoice = invoice.extracted?.phoneOnInvoice;
   const sources = intel ? uniqueByHost(intel.sources).slice(0, 3) : [];
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
+    <section className="card text-gray-900">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Public web check</h2>
+        <h2 className="card-title">Public web check</h2>
         <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
           Looked up live with Bright Data
         </span>

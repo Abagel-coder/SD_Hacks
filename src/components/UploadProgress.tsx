@@ -35,7 +35,7 @@ export function UploadProgress({ done }: { done: boolean }) {
                 state === 'done'
                   ? 'bg-green-600 text-white'
                   : state === 'active'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-accent text-white'
                     : 'bg-gray-100 text-gray-400 ring-1 ring-gray-200'
               }`}
               aria-hidden

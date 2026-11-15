@@ -90,11 +90,11 @@ export default function InvoicePage() {
 
       <ComparisonPanel invoice={invoice} vendor={vendor} />
 
-      <div className="grid items-start gap-4 md:grid-cols-2">
-        <div className="space-y-4">
+      <div className="grid items-start gap-6 md:grid-cols-2">
+        <div className="space-y-6">
           <RiskPanel invoice={invoice} />
         </div>
-        <div className="space-y-4">
+        <div className="space-y-6">
           <CallPanel detail={data} onChange={refresh} />
           <VendorCheck invoice={invoice} />
         </div>

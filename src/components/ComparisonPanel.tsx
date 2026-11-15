@@ -81,9 +81,9 @@ export function ComparisonPanel({ invoice, vendor }: { invoice: InvoiceRow; vend
   const mismatches = rows.filter(isMismatch).length;
 
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
+    <section className="card text-gray-900">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Does the invoice match?</h2>
+        <h2 className="card-title">Does the invoice match?</h2>
         <span
           className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
             mismatches > 0 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'

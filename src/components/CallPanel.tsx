@@ -62,8 +62,8 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
   }
 
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Vendor verification</h2>
+    <section className="card text-gray-900">
+      <h2 className="card-title">Vendor verification</h2>
 
       {invoice.status === 'frozen' && blocklisted && (
         <p className="mt-3 text-sm font-medium text-amber-950">
@@ -78,7 +78,7 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
           </p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => void verifyInBrowser()} disabled={busy}
-              className="rounded bg-blue-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+              className="btn-primary">
               {busy ? 'Starting…' : 'Verify in browser'}
             </button>
           </div>
@@ -165,10 +165,10 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
                     className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm ${
                       agent
                         ? 'rounded-bl-md bg-white text-gray-800 ring-1 ring-gray-200'
-                        : 'rounded-br-md bg-blue-700 text-white'
+                        : 'rounded-br-md bg-accent text-white'
                     }`}
                   >
-                    <p className={`mb-0.5 text-xs font-semibold uppercase tracking-wide ${agent ? 'text-gray-500' : 'text-blue-100'}`}>
+                    <p className={`mb-0.5 text-xs font-semibold uppercase tracking-wide ${agent ? 'text-gray-500' : 'text-white/75'}`}>
                       {agent ? 'Agent' : 'Vendor'}
                     </p>
                     <p>{turn.message}</p>

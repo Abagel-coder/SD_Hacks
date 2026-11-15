@@ -24,9 +24,9 @@ function totals(invoices: InvoiceRow[]): Totals {
 
 function Stat({ label, value, hint, accent }: { label: string; value: string; hint: string; accent: string }) {
   return (
-    <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-white p-4">
+    <div className="card relative overflow-hidden">
       <span className={`absolute inset-y-0 left-0 w-1 ${accent}`} aria-hidden />
-      <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">{label}</p>
+      <p className="card-title">{label}</p>
       <p className="mt-1 text-2xl font-bold tabular-nums text-gray-900">{value}</p>
       <p className="text-xs text-gray-500">{hint}</p>
     </div>
@@ -38,7 +38,7 @@ export function StatsStrip({ invoices, loading }: { invoices: InvoiceRow[]; load
   const show = (value: string) => (loading ? '…' : value);
   return (
     <section aria-label="Totals" className="grid grid-cols-2 gap-3 md:grid-cols-4">
-      <Stat label="$ protected" value={show(money(t.protectedAmount))} hint="held or stopped" accent="bg-blue-600" />
+      <Stat label="$ protected" value={show(money(t.protectedAmount))} hint="held or stopped" accent="bg-accent" />
       <Stat label="Frozen" value={show(String(t.frozen))} hint="waiting on the vendor" accent="bg-amber-400" />
       <Stat label="Blocked" value={show(String(t.blocked))} hint="vendor denied" accent="bg-red-600" />
       <Stat label="Approved" value={show(String(t.approved))} hint="paid as normal" accent="bg-green-600" />

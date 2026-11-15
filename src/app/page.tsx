@@ -45,7 +45,7 @@ export default function Dashboard() {
           No invoices yet. Upload one to check it.
         </p>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="card overflow-x-auto px-3 py-2">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-gray-200 text-xs uppercase text-gray-500">
               <tr className="*:whitespace-nowrap *:px-2 *:py-2">

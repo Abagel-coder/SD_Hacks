@@ -99,7 +99,7 @@ export function StatusTimeline({ status, call }: { status: InvoiceStatus; call: 
   const reached = steps.reduce((last, step, index) => (step.state === 'done' || step.state === 'current' ? index : last), 0);
 
   return (
-    <nav aria-label="Invoice progress" className="rounded-lg border border-gray-200 bg-white px-4 py-4">
+    <nav aria-label="Invoice progress" className="card">
       <ol className="relative flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-0">
         {/* Connector track (desktop) with a fill that grows as the invoice moves along. */}
         <span className="absolute left-12 right-12 top-[16px] hidden h-1 rounded-full bg-gray-200 sm:block" aria-hidden />

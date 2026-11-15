@@ -61,7 +61,7 @@ function CallControls({ callId }: { callId: string }) {
         </button>
       ) : (
         <button onClick={start} disabled={status === 'connecting'}
-          className="rounded-lg bg-blue-600 px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50">
+          className="btn-primary px-5 py-3 text-base">
           {status === 'connecting' ? 'Connecting…' : 'Start browser call'}
         </button>
       )}
