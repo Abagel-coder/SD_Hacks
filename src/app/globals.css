@@ -1,42 +1,204 @@
 @import "tailwindcss";
 
 :root {
-  --background: #efe4d4; /* light brown page */
-  --foreground: #2b1f15;
+  /* Uber careers–inspired stage: near-black, chalk white, brand green */
+  --background: #070707;
+  --foreground: #f5f5f5;
+  --ig-green: #06c167;
+  --ig-green-dim: #049a52;
+  --ig-panel: #121212;
+  --ig-panel-2: #1a1a1a;
+  --ig-line: rgba(255, 255, 255, 0.12);
+  --ig-muted: rgba(245, 245, 245, 0.62);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono);
+  --font-display: var(--font-display);
 }
 
-/* Light brown theme: every gray utility (text, borders, panels) becomes a warm brown, and white cards
-   become cream. Status colours (amber, red, green, blue) are untouched so their meaning stays. */
+/* Remap gray scale onto the dark stage so legacy gray-* utilities stay readable.
+   Do NOT remap white — text-white / bg-white must stay true white for contrast. */
 @theme {
-  --color-white: #fffaf4;
-  --color-gray-50: #faf5ee;
-  --color-gray-100: #f3eadd;
-  --color-gray-200: #e6d7c3;
-  --color-gray-300: #d3bea1;
-  --color-gray-400: #b0977a;
-  --color-gray-500: #846a4f;
-  --color-gray-600: #6b543d;
-  --color-gray-700: #54412e;
-  --color-gray-800: #3d2e20;
-  --color-gray-900: #2b1f15;
-  --color-gray-950: #1c140d;
+  --color-gray-50: #0c0c0c;
+  --color-gray-100: #141414;
+  --color-gray-200: #242424;
+  --color-gray-300: #3a3a3a;
+  --color-gray-400: #6b6b6b;
+  --color-gray-500: #8a8a8a;
+  --color-gray-600: #b0b0b0;
+  --color-gray-700: #d0d0d0;
+  --color-gray-800: #e8e8e8;
+  --color-gray-900: #f5f5f5;
+  --color-gray-950: #ffffff;
 }
 
-/* Invoice Guard is a light-theme dashboard; ignore OS dark preference so
-   white cards (upload form, panels) keep readable dark text. */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Soft vignette + grain atmosphere (not flat black) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(120% 80% at 10% -10%, rgba(6, 193, 103, 0.16), transparent 55%),
+    radial-gradient(90% 60% at 100% 0%, rgba(255, 255, 255, 0.06), transparent 45%),
+    radial-gradient(80% 50% at 50% 120%, rgba(6, 193, 103, 0.08), transparent 50%);
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+::selection {
+  background: rgba(6, 193, 103, 0.35);
+  color: #fff;
+}
+
+a {
+  transition: color 200ms ease, opacity 200ms ease, transform 200ms ease;
+}
+
+/* Uber-style reveal: fade + lift */
+.ig-reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.ig-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.ig-stagger > .ig-reveal:nth-child(1) { transition-delay: 40ms; }
+.ig-stagger > .ig-reveal:nth-child(2) { transition-delay: 90ms; }
+.ig-stagger > .ig-reveal:nth-child(3) { transition-delay: 140ms; }
+.ig-stagger > .ig-reveal:nth-child(4) { transition-delay: 190ms; }
+.ig-stagger > .ig-reveal:nth-child(5) { transition-delay: 240ms; }
+.ig-stagger > .ig-reveal:nth-child(6) { transition-delay: 290ms; }
+.ig-stagger > .ig-reveal:nth-child(7) { transition-delay: 340ms; }
+.ig-stagger > .ig-reveal:nth-child(8) { transition-delay: 390ms; }
+.ig-stagger > .ig-reveal:nth-child(n+9) { transition-delay: 420ms; }
+
+/* Oversized display type */
+.ig-display {
+  font-family: var(--font-display), var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+.ig-green {
+  color: var(--ig-green);
+}
+
+.ig-panel {
+  background: linear-gradient(180deg, var(--ig-panel-2), var(--ig-panel));
+  border: 1px solid var(--ig-line);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  transition: border-color 250ms ease, transform 250ms ease, box-shadow 250ms ease;
+}
+
+.ig-panel:hover {
+  border-color: rgba(6, 193, 103, 0.35);
+}
+
+.ig-row {
+  transition: background-color 200ms ease, transform 200ms ease;
+}
+
+.ig-row:hover {
+  background: rgba(6, 193, 103, 0.08);
+}
+
+.ig-btn {
+  background: var(--ig-green);
+  color: #04140b;
+  font-weight: 700;
+  transition: transform 200ms ease, background-color 200ms ease, box-shadow 200ms ease;
+}
+
+.ig-btn:hover:not(:disabled) {
+  background: #17d67a;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(6, 193, 103, 0.35);
+}
+
+.ig-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.ig-underline {
+  background-image: linear-gradient(var(--ig-green), var(--ig-green));
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 2px;
+  transition: background-size 300ms ease;
+}
+
+.ig-underline:hover,
+.ig-underline.is-active {
+  background-size: 100% 2px;
+}
+
+/* Marquee strip like oversized type crossing the stage */
+@keyframes ig-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.ig-marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.ig-marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 3rem;
+  animation: ig-marquee 28s linear infinite;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(2.5rem, 8vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: rgba(255, 255, 255, 0.08);
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .ig-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .ig-marquee-track { animation: none; }
+  .ig-btn:hover:not(:disabled) { transform: none; }
 }

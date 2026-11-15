@@ -3,19 +3,19 @@ import type { AuditRow } from '@/lib/types';
 
 export function AuditLog({ rows }: { rows: AuditRow[] }) {
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Audit log</h2>
+    <section className="ig-panel rounded-2xl p-4 text-white">
+      <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/45">Audit log</h2>
       <ol className="mt-2 space-y-2 text-sm">
         {rows.map((row) => (
           <li key={row.id}>
             <details>
-              <summary className="cursor-pointer">
-                <span className="tabular-nums text-gray-500">{clock(row.created_at)}</span>{' '}
-                <span className="rounded bg-gray-100 px-1 text-xs">{row.actor}</span>{' '}
-                <span className="font-medium">{row.action.replaceAll('_', ' ')}</span>
-                {row.reason && <span className="text-gray-700">: {row.reason}</span>}
+              <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <span className="tabular-nums text-white/40">{clock(row.created_at)}</span>{' '}
+                <span className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/70">{row.actor}</span>{' '}
+                <span className="font-medium text-white/90">{row.action.replaceAll('_', ' ')}</span>
+                {row.reason && <span className="text-white/55">: {row.reason}</span>}
               </summary>
-              <pre className="mt-1 overflow-x-auto rounded bg-gray-50 p-2 text-xs">
+              <pre className="mt-2 overflow-x-auto rounded-xl border border-white/10 bg-black/40 p-3 text-xs text-white/70">
                 {JSON.stringify({ input: row.input, result: row.result }, null, 2)}
               </pre>
             </details>

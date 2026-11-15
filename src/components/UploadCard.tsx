@@ -33,31 +33,45 @@ export function UploadCard({ onUploaded }: { onUploaded: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-wrap items-end gap-3 rounded-lg border border-gray-300 bg-background p-4 text-gray-900">
-      <label className="flex flex-col text-sm text-gray-900">
-        <span className="mb-1 font-medium text-gray-900">Invoice (PDF or image)</span>
+    <form
+      onSubmit={submit}
+      className="ig-panel flex flex-wrap items-end gap-4 rounded-2xl p-5 text-white sm:p-6"
+    >
+      <div className="min-w-[12rem] flex-1">
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ig-green)]">
+          Check an invoice
+        </p>
+        <p className="mb-4 max-w-md text-sm text-white/55">
+          Drop a PDF or image. We read it, fact-check the vendor on the public web, and score the risk.
+        </p>
+      </div>
+      <label className="flex min-w-[10rem] flex-1 flex-col text-sm">
+        <span className="mb-1.5 font-medium text-white/80">Invoice (PDF or image)</span>
         <input
           name="file"
           type="file"
           accept="application/pdf,image/png,image/jpeg"
-          className="text-sm text-gray-900 file:mr-3 file:rounded file:border-0 file:bg-gray-100 file:px-3 file:py-1 file:text-sm file:font-medium file:text-gray-900"
+          className="text-sm text-white/80 file:mr-3 file:rounded-full file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-white/15"
         />
       </label>
-      <label className="flex flex-col text-sm text-gray-900">
-        <span className="mb-1 font-medium text-gray-900">Sender email (optional)</span>
+      <label className="flex min-w-[12rem] flex-1 flex-col text-sm">
+        <span className="mb-1.5 font-medium text-white/80">Sender email (optional)</span>
         <input
           name="senderEmail"
           type="email"
           placeholder="billing@vendor.com"
-          className="rounded border border-gray-300 bg-white px-2 py-1 text-gray-900 placeholder:text-gray-500"
+          className="rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-white placeholder:text-white/35 focus:border-[var(--ig-green)] focus:outline-none"
         />
       </label>
-      <button type="submit" disabled={busy}
-        className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50">
+      <button type="submit" disabled={busy} className="ig-btn rounded-full px-5 py-2.5 text-sm disabled:opacity-50">
         {busy ? 'Checking invoice…' : 'Check invoice'}
       </button>
-      {busy && <span className="text-sm text-gray-700">Reading, verifying the vendor and scoring. This takes up to 30 seconds.</span>}
-      {error && <span className="text-sm text-red-700">{error}</span>}
+      {busy && (
+        <span className="w-full text-sm text-white/50">
+          Reading, verifying the vendor and scoring. This takes up to 30 seconds.
+        </span>
+      )}
+      {error && <span className="w-full text-sm text-red-400">{error}</span>}
     </form>
   );
 }

@@ -28,9 +28,9 @@ function domainAge(days: number): string {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between gap-4 border-b border-gray-200 py-1 last:border-b-0">
-      <dt className="text-gray-600">{label}</dt>
-      <dd className="text-right font-medium">{value}</dd>
+    <div className="flex justify-between gap-4 border-b border-white/10 py-2 last:border-b-0">
+      <dt className="text-white/50">{label}</dt>
+      <dd className="text-right font-medium text-white/90">{value}</dd>
     </div>
   );
 }
@@ -40,15 +40,15 @@ export function VendorCheck({ invoice }: { invoice: InvoiceRow }) {
   const phoneOnInvoice = invoice.extracted?.phoneOnInvoice;
   const sources = intel ? uniqueByHost(intel.sources).slice(0, 3) : [];
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
+    <section className="ig-panel rounded-2xl p-4 text-white">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Public web check</h2>
-        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/45">Public web check</h2>
+        <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-medium text-white/60">
           Looked up live with Bright Data
         </span>
       </div>
       {!intel || !intel.available ? (
-        <p className="mt-2 text-sm text-gray-600">The public web check was unavailable for this invoice.</p>
+        <p className="mt-2 text-sm text-white/50">The public web check was unavailable for this invoice.</p>
       ) : (
         <>
           <dl className="mt-2 text-sm">
@@ -67,10 +67,10 @@ export function VendorCheck({ invoice }: { invoice: InvoiceRow }) {
             <Row label="Phone printed on invoice" value={phoneOnInvoice ? formatPhone(phoneOnInvoice) : 'none'} />
           </dl>
           {sources.length > 0 && (
-            <p className="mt-2 truncate text-xs text-gray-500">
+            <p className="mt-3 truncate text-xs text-white/40">
               Sources:{' '}
               {sources.map((source, index) => (
-                <a key={source.host} href={source.url} target="_blank" rel="noreferrer" className="underline">
+                <a key={source.host} href={source.url} target="_blank" rel="noreferrer" className="text-[var(--ig-green)] underline underline-offset-2">
                   {index > 0 ? ', ' : ''}{source.host}
                 </a>
               ))}
