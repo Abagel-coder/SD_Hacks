@@ -58,8 +58,8 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
       <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Vendor verification</h2>
 
       {invoice.status === 'frozen' && blocklisted && (
-        <p className="mt-3 text-sm font-medium text-red-800">
-          Already denied by vendor, blocked automatically.
+        <p className="mt-3 text-sm font-medium text-amber-950">
+          Already denied by vendor. Payment stays frozen.
         </p>
       )}
 
