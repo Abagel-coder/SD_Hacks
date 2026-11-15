@@ -56,7 +56,7 @@ export default function BlocklistPage() {
 
       {data && entries.length === 0 ? (
         <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-600">
-          Nothing blocked yet. When a vendor denies a bank change by phone, the account and sender
+          Nothing blocked yet. When a vendor denies a bank change on a verification call, the account and sender
           domain land here.
         </p>
       ) : (
