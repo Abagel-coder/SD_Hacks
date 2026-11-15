@@ -199,3 +199,15 @@ export async function getCallByConversationId(conversationId: string): Promise<C
   const rows = await db()`select * from calls where conversation_id = ${conversationId} limit 1`;
   return (rows[0] as CallRow | undefined) ?? null;
 }
+
+// P2: Gemini result cache (see src/lib/gemini/cache.ts).
+export async function getGeminiCache(key: string): Promise<unknown | null> {
+  const rows = await db()`select result from gemini_cache where key = ${key}`;
+  return rows[0]?.result ?? null;
+}
+
+export async function putGeminiCache(key: string, kind: 'extract' | 'explain', result: unknown): Promise<void> {
+  await db()`
+    insert into gemini_cache (key, kind, result) values (${key}, ${kind}, ${JSON.stringify(result)}::jsonb)
+    on conflict (key) do update set result = excluded.result, created_at = now()`;
+}

@@ -1,8 +1,11 @@
 import { MOCK_EXTRACTED } from '../mocks';
 import type { ExtractedInvoice } from '../types';
 import { isMock } from '../util';
+import { cachedGemini, sha256 } from './cache';
 import { generateJson, type GeminiInput } from './client';
 import { toExtractedInvoice, type RawExtraction } from './normalize';
+
+const EXTRACT_VERSION = 'v1';
 
 const str = (description: string) => ({ type: 'string', description });
 
@@ -44,6 +47,8 @@ export async function extractInvoice(
     ? { type: 'document', data, mime_type: file.mimeType }
     : { type: 'image', data, mime_type: file.mimeType };
 
-  const raw = await generateJson<RawExtraction>([{ type: 'text', text: PROMPT }, attachment], SCHEMA);
+  // Bump EXTRACT_VERSION whenever PROMPT or SCHEMA changes, so old cached results are not reused.
+  const raw = await cachedGemini('extract', `${EXTRACT_VERSION}:${sha256(file.bytes)}`, () =>
+    generateJson<RawExtraction>([{ type: 'text', text: PROMPT }, attachment], SCHEMA));
   return toExtractedInvoice(raw, senderEmail);
 }

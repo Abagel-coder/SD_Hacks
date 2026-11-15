@@ -1,5 +1,5 @@
 export const DROP_STATEMENTS: string[] = [
-  'drop table if exists blocklist, audit_log, calls, invoices, vendors cascade',
+  'drop table if exists gemini_cache, blocklist, audit_log, calls, invoices, vendors cascade',
 ];
 
 export const SCHEMA_STATEMENTS: string[] = [
@@ -76,5 +76,12 @@ export const SCHEMA_STATEMENTS: string[] = [
     source_invoice_id uuid,
     created_at timestamptz not null default now(),
     unique (kind, value)
+  )`,
+  // P2: Gemini results keyed by content hash, so re-uploading the same file makes no Gemini call.
+  `create table if not exists gemini_cache (
+    key text primary key,
+    kind text not null check (kind in ('extract','explain')),
+    result jsonb not null,
+    created_at timestamptz not null default now()
   )`,
 ];
