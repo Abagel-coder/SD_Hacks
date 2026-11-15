@@ -13,7 +13,7 @@ export async function explainRisk(invoice: ExtractedInvoice, risk: RiskResult): 
   const prompt = [
     'You explain invoice fraud risk to a busy small-business owner.',
     'Write two or three plain sentences saying why this invoice is risky and what could happen if it is paid.',
-    'Use only the facts below. No bullet points, no jargon, no advice beyond "verify by phone".',
+    'Use only the facts below. No bullet points, no jargon, no advice beyond "verify with a verification call".',
     '',
     `Vendor: ${invoice.vendorName}`,
     `Amount: ${invoice.amount} ${invoice.currency}`,
