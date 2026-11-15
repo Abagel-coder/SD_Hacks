@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { InvoiceRow, RiskCode } from '@/lib/types';
 
 const REASON_TITLE: Partial<Record<RiskCode, string>> = {
@@ -10,7 +11,16 @@ const REASON_TITLE: Partial<Record<RiskCode, string>> = {
   URGENCY_OR_SECRECY: 'Pressure or secrecy language',
   UNKNOWN_VENDOR: 'No payment history with this vendor',
   AI_FLAGGED: 'Gemini flagged a warning sign',
+  NO_WEB_PRESENCE: 'Sender domain has no public web presence',
 };
+
+function formatBlockedDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
 
 function scoreTone(score: number): { text: string; bar: string; label: string } {
   if (score >= 50) return { text: 'text-red-700', bar: 'bg-red-600', label: 'High risk — do not pay' };
@@ -43,6 +53,19 @@ export function RiskPanel({ invoice }: { invoice: InvoiceRow }) {
       {invoice.explanation && (
         <p className="mt-3 rounded-md bg-gray-50 p-3 text-sm leading-relaxed text-gray-800">
           {invoice.explanation}
+        </p>
+      )}
+
+      {invoice.similar_scam && (
+        <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-950">
+          ⚠ Similar to a scam blocked on {formatBlockedDate(invoice.similar_scam.blockedAt)}{' '}
+          ({Math.round(invoice.similar_scam.similarity * 100)}% match).{' '}
+          <Link
+            href={`/invoices/${invoice.similar_scam.invoiceId}`}
+            className="font-semibold underline underline-offset-2"
+          >
+            View that invoice
+          </Link>
         </p>
       )}
 
