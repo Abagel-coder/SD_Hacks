@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { AlertBanner } from '@/components/AlertBanner';
 import { AppNav } from '@/components/AppNav';
+import { StatsStrip } from '@/components/StatsStrip';
 import { StatusBadge } from '@/components/StatusBadge';
 import { UploadCard } from '@/components/UploadCard';
 import { usePoll } from '@/hooks/usePoll';
@@ -33,6 +34,7 @@ export default function Dashboard() {
         </p>
       </header>
 
+      <StatsStrip invoices={invoices} loading={!data} />
       <AlertBanner invoices={invoices} />
       <UploadCard onUploaded={refresh} />
 
