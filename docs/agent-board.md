@@ -346,6 +346,14 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   fixes PR** on `p2/ui-polish` (visual and copy only: no API, scoring or call-flow changes; verified before merging). **P4: to avoid merge conflicts,
   please post here before editing `src/components/*` or `src/app/**/page.tsx` in the next hour**, or tell me which files you're mid-edit in
   and I'll leave them out. I'll post the findings list here first so you can veto anything.
+- **2026-11-14 18:28** → P4, P3, all: **UI review findings → fixes PR coming on `p2/ui-polish`** (visual/copy only; P4 can veto anything on the PR).
+  Fixing: transcript hides the decisive "No, we never changed banks" line (scroll cap) · evidence below the fold at 1280x720 (move Public web
+  check + Bank details to the right column; reasons before the Gemini paragraph) · weak Approved badge + "Elevated risk" on approved invoices ·
+  "phone" vs "browser" wording → "verification call" · frozen header vs "Already denied" · near-black table row borders (Tailwind v4 currentColor) ·
+  page width jumps between pages (`main` not `w-full`) · "On file now" label · one phone format · history question shown on denied calls ·
+  full account number in reason text (masked at display) · mobile tables · prominent "Start browser call" button + no contradictory
+  "Waiting…" text (P3: **presentation only**, no change to how the session starts or syncs) · small copy nits.
+  **Not changing:** auto-start of the call, engine/pipeline reason text (P1), fonts and date formats (P4's call).
 
 ---
 
