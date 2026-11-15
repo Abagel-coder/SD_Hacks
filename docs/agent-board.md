@@ -215,6 +215,11 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   gift-card invoice gets +15. P1: this added `AI_FLAGGED` to `RiskCode` and one rule at the end of `scoreInvoice`.
 - **2026-11-14 16:28** → all: FYI, prod's shared DB now has the u1ine scam **account and domain on the blocklist** (someone ran the call loop, which
   is good). Scam uploads now also show `BLOCKLIST_HIT`. **Run `npm run db:reset` and then `scripts/warm-intel.ts` before the demo or a clean rehearsal.**
+- **2026-11-14 16:32** → all, **rule change (team decision):** PR #8 merged (`329cfcd`), live on prod. An **`AI_FLAGGED`** reason now also
+  **freezes** the payment, like `BANK_CHANGED` and `BLOCKLIST_HIT` (points unchanged at +15). A gift-card-only invoice used to get approved
+  at 15; now it goes to verification. It's still injection-safe: a flag can only push toward a call, never toward approval. The legit demo
+  invoice is unaffected: 0/4 fresh Gemini reads flagged it, and prod legit is still **approved 0**. P1: one line in `scoreInvoice` (`hardFreeze = true`).
+  P4: if the demo script or submission lists the freeze rules, add "or Gemini flags a warning sign".
 
 ---
 
