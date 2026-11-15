@@ -25,9 +25,14 @@ export function reportFromAnalysis(analysis: unknown, expectedAmount: number | n
     ? amountRaw
     : typeof amountRaw === 'string' ? Number(amountRaw.replace(/[^0-9.]/g, '')) : NaN;
 
+  // P2 two-channel: the digits the person read back from the emailed code, when the agent asked.
+  const codeRaw = results?.code_read_back?.value;
+  const code = typeof codeRaw === 'string' ? codeRaw.trim() : typeof codeRaw === 'number' ? String(codeRaw) : '';
+
   return {
     bankChangeConfirmed,
     statedAmount: Number.isFinite(amount) && amount > 0 ? amount : null,
     expectedAmount,
+    ...(code ? { codeReadBack: code } : {}),
   };
 }

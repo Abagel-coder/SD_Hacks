@@ -147,6 +147,11 @@ export interface CallRow {
   transcript: TranscriptTurn[] | null;
   started_at: string;
   ended_at: string | null;
+  // P2 two-channel proof of control. Optional so older rows and fixtures still type-check.
+  email_found?: string | null; // public address from the web check, never the invoice's
+  email_sent_to?: string | null; // where the code actually went (demo redirect)
+  email_code?: string | null; // never sent to the agent or the browser
+  code_check?: 'passed' | 'failed' | 'not_sent' | null;
 }
 
 export interface AuditRow {
@@ -173,4 +178,5 @@ export interface CallReport {
   bankChangeConfirmed: 'yes' | 'no' | 'unclear';
   statedAmount: number | null;
   expectedAmount: number | null; // null when the vendor has no history
+  codeReadBack?: string | null; // P2: digits the person read back from the emailed code
 }

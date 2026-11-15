@@ -5,6 +5,7 @@ import { claimCall, updateCall } from '../repo';
 import type { CallReport, CallRow, TranscriptTurn } from '../types';
 import { isMock } from '../util';
 import { classifyOutcome, reportFromAnalysis } from './classify';
+import { decideWithCode } from './email-code';
 import type { ConversationData } from './elevenlabs';
 
 const ANALYSIS_SCHEMA = {
@@ -12,6 +13,7 @@ const ANALYSIS_SCHEMA = {
   properties: {
     bankChangeConfirmed: { type: 'string', description: 'Exactly yes, no or unclear' },
     statedAmount: { type: 'number', description: 'Dollar amount the vendor stated for the past invoice, or 0' },
+    codeReadBack: { type: 'string', description: 'Digits of the emailed verification code the vendor read back, or empty' },
   },
   required: ['bankChangeConfirmed', 'statedAmount'],
 };
@@ -20,7 +22,7 @@ async function analyzeTranscript(transcript: TranscriptTurn[], expectedAmount: n
   const unclear: CallReport = { bankChangeConfirmed: 'unclear', statedAmount: null, expectedAmount };
   if (isMock('GEMINI') || transcript.length === 0) return unclear;
   try {
-    const out = await generateJson<{ bankChangeConfirmed: string; statedAmount: number }>([{
+    const out = await generateJson<{ bankChangeConfirmed: string; statedAmount: number; codeReadBack?: string }>([{
       type: 'text',
       text:
         'This is a transcript of a call asking a vendor whether they requested a bank account change. ' +
@@ -35,6 +37,7 @@ async function analyzeTranscript(transcript: TranscriptTurn[], expectedAmount: n
       bankChangeConfirmed: answer === 'yes' ? 'yes' : answer === 'no' ? 'no' : 'unclear',
       statedAmount: out.statedAmount > 0 ? out.statedAmount : null,
       expectedAmount,
+      ...(out.codeReadBack ? { codeReadBack: out.codeReadBack } : {}),
     };
   } catch (err) {
     console.error('Transcript analysis failed', err);
@@ -54,13 +57,20 @@ export async function finalizeCall(call: CallRow, conversation: ConversationData
   const report = reportFromAnalysis(conversation.analysis, expected)
     ?? (await analyzeTranscript(transcript, expected));
   const outcome = classifyOutcome(report);
+  // P2 two-channel: a "yes" also needs the emailed code. A failed check is stored as 'unclear'
+  // (no new outcome value) and decided as 'escalate': frozen for the owner, nothing blocklisted.
+  const { decision, codeCheck } = decideWithCode(outcome, call.email_code ?? null, report.codeReadBack ?? null);
+  const stored = decision === 'escalate' ? 'unclear' : decision;
 
-  await updateCall(call.id, { outcome, transcript, conversationId: conversation.conversation_id });
+  await updateCall(call.id, {
+    outcome: stored, transcript, conversationId: conversation.conversation_id, ...(codeCheck ? { codeCheck } : {}),
+  });
   await logAudit(call.invoice_id, 'agent', 'verification_call_result',
     { callId: call.id, channel: call.channel, numberDialed: call.number_dialed },
-    { bankChangeConfirmed: report.bankChangeConfirmed, statedAmount: report.statedAmount, outcome },
-    `The vendor's answer to the bank change question was "${report.bankChangeConfirmed}". Outcome: ${outcome}.`);
-  await applyDecision(call.invoice_id, call.id, outcome);
+    { bankChangeConfirmed: report.bankChangeConfirmed, statedAmount: report.statedAmount, outcome: stored, ...(codeCheck ? { codeCheck } : {}) },
+    `The vendor's answer to the bank change question was "${report.bankChangeConfirmed}". Outcome: ${stored}` +
+      (codeCheck ? `; emailed code check ${codeCheck}.` : '.'));
+  await applyDecision(call.invoice_id, call.id, decision);
 }
 
 export async function failCall(call: CallRow, reason: string): Promise<void> {
