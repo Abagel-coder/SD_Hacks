@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 
 export function AppNav({ current }: { current: 'invoices' | 'blocklist' | 'backtest' }) {
@@ -8,7 +6,11 @@ export function AppNav({ current }: { current: 'invoices' | 'blocklist' | 'backt
     return (
       <Link
         href={href}
-        className={`ig-underline text-sm ${active ? 'is-active text-white' : 'text-white/60 hover:text-white'}`}
+        className={
+          active
+            ? 'text-sm font-semibold text-gray-900 underline decoration-2 underline-offset-4'
+            : 'text-sm text-gray-600 hover:text-gray-900 hover:underline underline-offset-4'
+        }
       >
         {label}
       </Link>
@@ -16,21 +18,17 @@ export function AppNav({ current }: { current: 'invoices' | 'blocklist' | 'backt
   };
 
   return (
-    <nav className="sticky top-0 z-40 -mx-6 mb-2 border-b border-white/10 bg-[#070707]/80 px-6 py-4 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4">
-        <div>
-          <Link href="/" className="ig-display text-xl text-white transition hover:text-[var(--ig-green)]">
-            Invoice Guard
-          </Link>
-          <p className="mt-0.5 text-xs tracking-wide text-white/45">
-            Check every invoice before it is paid
-          </p>
-        </div>
-        <div className="flex items-center gap-5">
-          {link('/', 'invoices', 'Invoices')}
-          {link('/blocklist', 'blocklist', 'Blocklist')}
-          {link('/backtest', 'backtest', 'Backtest')}
-        </div>
+    <nav className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 pb-4">
+      <div>
+        <Link href="/" className="text-lg font-bold tracking-tight text-gray-900">
+          Invoice Guard
+        </Link>
+        <p className="text-xs text-gray-600">Check every invoice before it is paid</p>
+      </div>
+      <div className="flex items-center gap-4">
+        {link('/', 'invoices', 'Invoices')}
+        {link('/blocklist', 'blocklist', 'Blocklist')}
+        {link('/backtest', 'backtest', 'Backtest')}
       </div>
     </nav>
   );

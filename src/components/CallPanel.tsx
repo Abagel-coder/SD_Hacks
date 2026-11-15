@@ -61,44 +61,44 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
   }
 
   return (
-    <section className="ig-panel rounded-2xl p-4 text-white">
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/45">Vendor verification</h2>
+    <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Vendor verification</h2>
 
       {invoice.status === 'frozen' && blocklisted && (
-        <p className="mt-3 text-sm font-medium text-amber-200">
+        <p className="mt-3 text-sm font-medium text-amber-950">
           Already denied by vendor. Payment stays frozen.
         </p>
       )}
 
       {invoice.status === 'frozen' && !blocklisted && (
         <div className="mt-3 space-y-2">
-          <p className="text-sm leading-relaxed text-white/65">
+          <p className="text-sm leading-relaxed text-gray-700">
             The agent checks with the vendor on a verification call, using the publicly listed number for context — never the one printed on the invoice.
           </p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => void verifyInBrowser()} disabled={busy}
-              className="ig-btn rounded-full px-4 py-2 text-sm disabled:opacity-50">
+              className="rounded bg-blue-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
               {busy ? 'Starting…' : 'Verify in browser'}
             </button>
           </div>
           {call?.status === 'failed' && (
-            <p className="text-sm text-amber-200">The last call could not be completed. You can try again.</p>
+            <p className="text-sm text-amber-800">The last call could not be completed. You can try again.</p>
           )}
         </div>
       )}
 
       {invoice.status === 'blocked' && blocklisted && !call && (
-        <p className="mt-3 text-sm font-medium text-red-300">
+        <p className="mt-3 text-sm font-medium text-red-800">
           Already denied by vendor, blocked automatically.
         </p>
       )}
 
-      {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
+      {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
 
       {call && verifying && (
         <div className="mt-3 space-y-2">
-          <p className="flex items-center gap-2 text-sm font-medium text-[var(--ig-green)]">
-            <span className="h-2 w-2 animate-ping rounded-full bg-[var(--ig-green)]" />
+          <p className="flex items-center gap-2 text-sm font-medium text-blue-800">
+            <span className="h-2 w-2 animate-ping rounded-full bg-blue-600" />
             {liveStatus(call)}
           </p>
           {call.channel === 'browser' && <BrowserCall callId={call.id} />}
@@ -106,7 +106,7 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
       )}
 
       {call && call.channel === 'phone' && (
-        <p className="mt-3 text-xs text-white/50">
+        <p className="mt-3 text-xs text-gray-600">
           Number found on the public web: {call.number_found ?? 'none'}.
           {call.number_dialed && call.number_dialed !== call.number_found
             ? ` Demo redirect: dialled ${call.number_dialed} instead.`
@@ -115,11 +115,11 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
       )}
 
       {!call?.outcome && historyQuestion && (
-        <p className="mt-1 text-xs text-white/50">{historyQuestion}</p>
+        <p className="mt-1 text-xs text-gray-600">{historyQuestion}</p>
       )}
 
       {call?.email_found && (
-        <p className="mt-1 text-xs text-white/50">
+        <p className="mt-1 text-xs text-gray-600">
           {call.code_check === 'not_sent'
             ? `Email code: not sent to ${call.email_found}.`
             : `Email code sent to the vendor's public address ${call.email_found}` +
@@ -130,12 +130,12 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
 
       {call?.outcome && (
         <p
-          className={`mt-3 rounded-xl border p-3 text-base font-semibold ${
+          className={`mt-3 rounded-md border p-3 text-base font-semibold ${
             call.outcome === 'confirmed'
-              ? 'border-[var(--ig-green)]/40 bg-[var(--ig-green)]/10 text-[var(--ig-green)]'
+              ? 'border-green-300 bg-green-50 text-green-800'
               : call.code_check === 'failed'
-                ? 'border-amber-400/40 bg-amber-400/10 text-amber-200'
-                : 'border-red-400/40 bg-red-400/10 text-red-300'
+                ? 'border-amber-300 bg-amber-50 text-amber-900'
+                : 'border-red-300 bg-red-50 text-red-800'
           }`}
         >
           {call.code_check === 'failed'
@@ -145,13 +145,13 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
       )}
 
       {call?.outcome && historyQuestion && (
-        <p className="mt-2 text-xs text-white/50">{historyQuestion}</p>
+        <p className="mt-2 text-xs text-gray-600">{historyQuestion}</p>
       )}
 
       {call?.transcript && call.transcript.length > 0 && (
         <div className="mt-4 space-y-2">
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/45">Call transcript</h3>
-          <ol className="space-y-2 rounded-xl border border-white/10 bg-black/30 p-3">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Call transcript</h3>
+          <ol className="space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
             {call.transcript.map((turn, index) => {
               const agent = turn.role === 'agent';
               return (
@@ -160,13 +160,13 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
                   className={`flex ${agent ? 'justify-start' : 'justify-end'}`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
+                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm ${
                       agent
-                        ? 'rounded-bl-md border border-white/10 bg-white/5 text-white/85'
-                        : 'rounded-br-md bg-[var(--ig-green)] text-[#04140b]'
+                        ? 'rounded-bl-md bg-white text-gray-800 ring-1 ring-gray-200'
+                        : 'rounded-br-md bg-blue-700 text-white'
                     }`}
                   >
-                    <p className={`mb-0.5 text-xs font-semibold uppercase tracking-wide ${agent ? 'text-white/45' : 'text-[#04140b]/70'}`}>
+                    <p className={`mb-0.5 text-xs font-semibold uppercase tracking-wide ${agent ? 'text-gray-500' : 'text-blue-100'}`}>
                       {agent ? 'Agent' : 'Vendor'}
                     </p>
                     <p>{turn.message}</p>
@@ -179,7 +179,7 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
       )}
 
       {!call && invoice.status !== 'frozen' && !blocklisted && (
-        <p className="mt-3 text-sm text-white/50">No call was needed for this invoice.</p>
+        <p className="mt-3 text-sm text-gray-600">No call was needed for this invoice.</p>
       )}
     </section>
   );
