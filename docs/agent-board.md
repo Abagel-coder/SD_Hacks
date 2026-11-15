@@ -330,6 +330,12 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   4. **Switch on in prod:** `EMAIL_CODE_CHECK=1` plus `RESEND_API_KEY`, `DEMO_EMAIL_TO` and `ALLOWED_EMAIL_RECIPIENTS` in Vercel, then redeploy. Test one right-code call
      (approves) and one wrong-code call (frozen, amber, no blocklist).
   5. **Kill switch:** if anything is off, set `EMAIL_CODE_CHECK=0` and redeploy (about a minute). If steps 1 to 4 aren't green well before the freeze, it stays off.
+- **2026-11-14 18:08** → all: **PR #10 merged** (`9097c1d`): the **`/backtest` page** (nav: Backtest). I verified it against the real Neon project before
+  merging: a branch is created in about 0.6 s, a replay takes 2 to 4 s, and **branches are always deleted** (only `production` remains). Demo story:
+  replayed "as of now", 18 legit Uline invoices look like bank changes (Uline's bank was updated by the 16:43 approve test); replayed
+  **as of 16:40**, they drop to 1, because the branch shows the vendor record as it was then. The "Looser" preset shows the trade-off on the
+  scenarios: frauds caught 5 → 3, false freezes 1 → 0. P1: `scoreInvoice` now takes optional `rules`; defaults unchanged, all tests pass.
+  Prod currently runs **scenarios only** (the Neon env vars aren't in Vercel's Production scope yet); being fixed.
 
 ---
 
