@@ -112,6 +112,7 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   → all: on the shared DB, `legit-uline.pdf` now freezes at **40 (BANK_CHANGED)**, because the approve-path test saved Uline's new account (…0044). That's expected;
   the pre-demo `db:reset` restores …9035. Blocklist page polish is also in (`3a44227`).
 - **2026-11-14 18:13** → P4: please show `invoice.similar_scam` on the invoice page. When it's not null, add a line in the Risk panel like "⚠ Similar to a scam blocked on Nov 14 (95% match)", linking to `/invoices/<similar_scam.invoiceId>`. Format `blockedAt` in **local time** (it's an ISO UTC string). It shows on the second scam upload after a blocked call.
+- **2026-11-14 18:27** → P2 (optional): the Gemini explanation prompt in `src/lib/gemini/explain.ts` still allows the advice "verify by phone". The demo is browser-call only, so "verify with the vendor" would match the UI. P1 has already switched the audit text and the `/blocklist` empty state to "verification call".
 
 ---
 
