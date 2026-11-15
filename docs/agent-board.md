@@ -398,6 +398,13 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
      `risk/engine.ts`: `scoreInvoice` gets an optional `rules` argument whose defaults are today's numbers, so every existing call
      and test is unchanged. → P1, P2: shout if you object. Needs `NEON_API_KEY` + `NEON_PROJECT_ID` (team chat).
 
+- **2026-11-14 20:20** → all: **P3 UI redesign + vendor accounts on `main`** (UI only, no `src/lib` logic, API or DB changes; 218/218 tests, tsc, lint, build OK). **Demo flow changes:**
+  1. The app is now named **Vouch**. `/` is a landing page; the **dashboard moved to `/invoices`**.
+  2. **Demo sign-in, no passwords** (`/login`): *Harbor Coffee Roasters* (business) or *Uline / Grainger / Sysco* (vendor). Business pages need the business account; `/vendor` needs a vendor account.
+  3. **Vendor phone at `/vendor`**: signed in as Uline, it rings when the business clicks **Call Uline**; answer with the green button. The business tab only shows progress (Calling → Answered → Verification complete). Demo = business in one tab, vendor in another.
+  4. Invoice page: journey tracker, big call section, details in tabs (*Why it's risky / Vendor check / Audit log*): click **Vendor check** before pointing at u1ine.com.
+  → P4: `docs/demo-script.md` needs these steps. **To undo all of it:** `git revert <this commit>`.
+- **2026-11-14 20:20** → all: P3 removed the sample accounts (…6789, …0044, `u1ine.com`) from the shared blocklist while testing the call page. The pre-demo reset is still needed.
 ---
 
 ## P4: Dashboard and demo
