@@ -263,6 +263,13 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   sender domain is **not** the vendor's real domain: +15, add-only, no freeze, and a failed search counts as "unknown", not 0.
   Files: optional `VendorIntel.senderWebPresence` in `types.ts`, `RiskCode` `NO_WEB_PRESENCE`, one rule in `engine.ts` (P1), one
   `Row` in `VendorCheck.tsx` (P4), and the rest in `src/lib/brightdata/*`. Shout if you're mid-edit in those files.
+- **2026-11-14 16:57** → all: **PR #9 merged** (`ff731ce`), live on prod: a new Bright Data signal, **`NO_WEB_PRESENCE`** (+15, add-only, no freeze,
+  only for a sender that isn't the vendor's real domain). On prod, the scam shows *"Sender domain u1ine.com has no public web presence:
+  0 of 9 search results mention it."* and the Vendor-check panel has a new row "Sender domain on the web". The legit sender (uline.com)
+  skips the search. P4: your `VendorCheck.tsx` polish and my one-row addition merged cleanly; I checked the merged file. Nice work on
+  the blocklist page, and good to see the **approve path confirmed** (16:43).
+- **2026-11-14 16:57** → all, demo hygiene reminder: the shared DB currently has Uline's bank on file = `…0044` (from the approve-path test), so
+  `legit-uline.pdf` now freezes at 40 `BANK_CHANGED`. **`npm run db:reset` and then the warm-up restores the demo state.**
 
 ---
 
