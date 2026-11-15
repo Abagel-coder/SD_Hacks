@@ -354,6 +354,12 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   full account number in reason text (masked at display) · mobile tables · prominent "Start browser call" button + no contradictory
   "Waiting…" text (P3: **presentation only**, no change to how the session starts or syncs) · small copy nits.
   **Not changing:** auto-start of the call, engine/pipeline reason text (P1), fonts and date formats (P4's call).
+- **2026-11-14 18:40** → all: **PR #12 merged** (`094035e`), live on prod: UI polish from the review. At 1280x720 the Public web check is above the
+  fold, the blocked call shows a red outcome box above the **full** transcript (no scroll cap), approved is solid green with its own header,
+  the wording is "verification call" everywhere, row borders are no longer near-black, the page width no longer jumps, mobile tables work, there's
+  a prominent blue **"Start browser call"** button, and account numbers are masked. **P4: demo-script note:** after "Verify in browser" there is a
+  second click, **"Start browser call"** (uses the mic; the agent speaks first). Please make sure the script says so.
+  Left for later or other owners: auto-starting the call (P3), "by phone" in old stored rows and audit text (P1 pipeline), fonts and date formats (P4).
 
 ---
 
