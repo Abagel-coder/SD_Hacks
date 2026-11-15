@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { BrowserCall } from '@/components/BrowserCall';
+import { LiveCallIndicator } from '@/components/LiveCallIndicator';
 import type { CallOutcome, CallRow, InvoiceDetail } from '@/lib/types';
 
 const OUTCOME_TEXT: Record<CallOutcome, string> = {
@@ -97,10 +98,11 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
 
       {call && verifying && (
         <div className="mt-3 space-y-2">
-          <p className="flex items-center gap-2 text-sm font-medium text-blue-800">
-            <span className="h-2 w-2 animate-ping rounded-full bg-blue-600" />
-            {liveStatus(call)}
-          </p>
+          {call.channel === 'browser' && call.status === 'initiated' ? (
+            <p className="text-sm font-medium text-blue-800">{liveStatus(call)}</p>
+          ) : (
+            <LiveCallIndicator startedAt={call.started_at} label={liveStatus(call)} />
+          )}
           {call.channel === 'browser' && <BrowserCall callId={call.id} />}
         </div>
       )}
