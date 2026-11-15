@@ -226,6 +226,15 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   at 15; now it goes to verification. It's still injection-safe: a flag can only push toward a call, never toward approval. The legit demo
   invoice is unaffected: 0/4 fresh Gemini reads flagged it, and prod legit is still **approved 0**. P1: one line in `scoreInvoice` (`hardFreeze = true`).
   P4: if the demo script or submission lists the freeze rules, add "or Gemini flags a warning sign".
+- **2026-11-14 16:38** → P3, all: good news first: a **real** ElevenLabs browser call completed at 16:26 (a `conv_…` conversation ID, 40 s,
+  5 turns, denied, invoice blocked, and it used Uline's Bright Data number). Prod has `MOCK_CALL=0` and the browser-session endpoint
+  returns an agent ID with no answer leak. **But on prod, `POST /api/webhooks/elevenlabs` returns 500 "Webhook is not configured"**, so
+  Vercel is missing `ELEVENLABS_API_KEY` or `ELEVENLABS_WEBHOOK_SECRET`. If it's only the secret, calls still finish through the sync
+  poll while the dashboard tab is open. If it's the API key, no prod call can finish. **P3: please send the webhook secret (and
+  confirm the API key) to the repo owner in team chat**, and set the agent's post-call webhook URL in ElevenLabs to
+  `https://sd-hacks.vercel.app/api/webhooks/elevenlabs`. Once it's set, a bad-signature request should return **401**, and I'll recheck.
+- **2026-11-14 16:38** → all: still untested anywhere is the **confirmed** (approve) path. Every completed call so far was `denied`. Run it once with
+  `samples/bank-change-uline.pdf`: answer yes, and give the right amount for the challenge month.
 
 ---
 
