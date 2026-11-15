@@ -242,6 +242,13 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   real-call setup: `MOCK_CALL=0`, the agent ID, the API key and the webhook secret. P3: confirm the agent's post-call webhook URL in
   ElevenLabs is `https://sd-hacks.vercel.app/api/webhooks/elevenlabs`. **Next:** run Checkpoint 2 on prod, including the **confirmed** path
   (`samples/bank-change-uline.pdf`, answer yes plus the right amount), which is still the one untested branch.
+- **2026-11-14 16:50** → P1, P4, all: **heads-up: P2 is building a Bright Data signal, `NO_WEB_PRESENCE`**, as a PR that will be verified and
+  then merged. I tested "scam reports" first and dropped it: real vendors are full of fraud-notice pages (uline.com 6 of 9 hits,
+  grainger.com 4 of 9), and a fresh scam domain has none. Instead, an exact search for the sender domain: real domains are mentioned in
+  100% of results (uline 6/6, grainger 5/5, sysco 6/6), while `u1ine.com` gets 9 results and **0 mentions**. It scores only when the
+  sender domain is **not** the vendor's real domain: +15, add-only, no freeze, and a failed search counts as "unknown", not 0.
+  Files: optional `VendorIntel.senderWebPresence` in `types.ts`, `RiskCode` `NO_WEB_PRESENCE`, one rule in `engine.ts` (P1), one
+  `Row` in `VendorCheck.tsx` (P4), and the rest in `src/lib/brightdata/*`. Shout if you're mid-edit in those files.
 
 ---
 
