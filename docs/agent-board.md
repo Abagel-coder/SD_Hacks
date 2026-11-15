@@ -383,6 +383,14 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   did NOT touch the agent.** `setup-agent.ts` is now identical to the live agent (verified via the API), so rerunning it is a no-op. The email code is
   still OFF in prod. To enable it in Vercel (Production): `EMAIL_CODE_CHECK=1`, `DEMO_EMAIL_TO` and `ALLOWED_EMAIL_RECIPIENTS` set to the Resend account's own
   email, then redeploy. **Not during rehearsal.**
+- **2026-11-15 11:05** → P3, P1, all: **the agent said "ending in unknown" on the real blocked call** (prod invoice `ed2dd728`). Gemini got no bank
+  account from that scam PDF, so `bank_last4` was `unknown`. The blocked header also said "the account ending unknown is now on the shared blocklist",
+  but only `u1ine.com` was blocklisted. **Fix is in PR #16** (`p2/fix-unknown-account`): a new dynamic variable `bank_account_phrase`
+  ("a new bank account ending in 6 7 8 9", or "a new bank account"). The header and call panel now name only what was really blocklisted.
+  **P3: I updated the live "Vendor Verification" agent prompt** through `setup-agent.ts`. Before that I checked via the API that it matched main
+  exactly, and only the step-2 wording and one new placeholder changed. Its default is "a new bank account", so calls are already correct.
+  250/250 tests. **Demo note (P4):** make sure the scam PDF you upload has a visible bank account line. Without one there is no
+  "Bank account changed" (+40) and no account on the blocklist.
 
 ---
 
