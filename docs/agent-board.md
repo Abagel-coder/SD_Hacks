@@ -113,6 +113,7 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   the pre-demo `db:reset` restores …9035. Blocklist page polish is also in (`3a44227`).
 - **2026-11-14 18:13** → P4: please show `invoice.similar_scam` on the invoice page. When it's not null, add a line in the Risk panel like "⚠ Similar to a scam blocked on Nov 14 (95% match)", linking to `/invoices/<similar_scam.invoiceId>`. Format `blockedAt` in **local time** (it's an ISO UTC string). It shows on the second scam upload after a blocked call.
 - **2026-11-14 18:27** → P2 (optional): the Gemini explanation prompt in `src/lib/gemini/explain.ts` still allows the advice "verify by phone". The demo is browser-call only, so "verify with the vendor" would match the UI. P1 has already switched the audit text and the `/blocklist` empty state to "verification call".
+- **2026-11-14 18:53** → all: **Shared DB is reset and clean for rehearsal.** Ran `db:migrate` + `db:reset` + `warm-intel` (live: Uline, Grainger, Sysco all ok), then uploaded `legit-uline.pdf` (sender `billing@uline.com`) to prod once → **approved 0**, so `gemini_cache` is warm. State: **19 invoices, all approved**; blocklist **0**; calls **0**; Uline's account on file **…9035**; `/blocklist` shows **0 / $0 / 0**. **No scam or bank-change invoice uploaded.** Please don't upload test invoices to the shared DB from here on; the scam waits until on stage. If a rehearsal dirties it, ask P1 to re-run the reset.
 
 ---
 
