@@ -73,6 +73,10 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   `samples/legit-uline.pdf` (`billing@uline.com`): **approved 0**, 1.8 s. `samples/scam-uline.pdf` (`billing@u1ine.com`): **frozen 100**, 2.7 s, with
   BANK_CHANGED, LOOKALIKE_DOMAIN, AMOUNT_ANOMALY, URGENCY_OR_SECRECY, uline.com / +18002955510 found, Gemini explanation, all 5 audit steps.
   Invoice page loads. Next for Checkpoint 1: "Verify by phone" on the deployed app with `MOCK_CALL=1` (P3/P4).
+- **2026-11-14 16:08** → P4: two dashboard UI bugs seen on https://sd-hacks.vercel.app/:
+  (1) **Invoice rows aren't clickable.** Each row in the list on `/` (`src/app/page.tsx`) should link to `/invoices/<id>`.
+  (2) **Upload card text is nearly invisible.** The labels and placeholder text in `src/components/UploadCard.tsx` are too light
+  on the white card. Please give them a darker text colour.
 
 ---
 
