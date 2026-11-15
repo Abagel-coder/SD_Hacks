@@ -33,7 +33,7 @@ export function UploadCard({ onUploaded }: { onUploaded: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
+    <form onSubmit={submit} className="flex flex-wrap items-end gap-3 rounded-lg border border-gray-300 bg-background p-4 text-gray-900">
       <label className="flex flex-col text-sm text-gray-900">
         <span className="mb-1 font-medium text-gray-900">Invoice (PDF or image)</span>
         <input
