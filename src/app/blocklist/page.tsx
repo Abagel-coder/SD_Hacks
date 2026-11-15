@@ -4,8 +4,15 @@ import Link from 'next/link';
 import { AppNav } from '@/components/AppNav';
 import { usePoll } from '@/hooks/usePoll';
 import { displayBlockedValue, type BlocklistSummary } from '@/lib/blocklist';
-import { clock, money } from '@/lib/format';
+import { money } from '@/lib/format';
 import type { BlocklistKind } from '@/lib/types';
+
+/** '2026-11-14T16:26:00Z' -> 'Nov 14, 4:26 PM' in the viewer's timezone. */
+function addedAt(iso: string): string {
+  return new Date(iso).toLocaleString('en-US', {
+    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+  });
+}
 
 const KIND_LABEL: Record<BlocklistKind, string> = {
   bank_account: 'Bank account',
@@ -66,8 +73,8 @@ export default function BlocklistPage() {
           </thead>
           <tbody>
             {entries.map((entry) => (
-              <tr key={entry.id} className="border-b align-top">
-                <td className="py-2 text-gray-700">{KIND_LABEL[entry.kind]}</td>
+              <tr key={entry.id} className="border-b align-middle *:py-2">
+                <td className="text-gray-700">{KIND_LABEL[entry.kind]}</td>
                 <td className="font-mono">{displayBlockedValue(entry.kind, entry.value)}</td>
                 <td>
                   {entry.sourceInvoiceId ? (
@@ -80,7 +87,7 @@ export default function BlocklistPage() {
                 </td>
                 <td className="text-right tabular-nums">{entry.amount === null ? 'n/a' : money(entry.amount)}</td>
                 <td className="pl-4 text-gray-700">{entry.reason ?? 'n/a'}</td>
-                <td className="text-right text-gray-600">{clock(entry.createdAt)}</td>
+                <td className="whitespace-nowrap text-right text-gray-600">{addedAt(entry.createdAt)}</td>
               </tr>
             ))}
           </tbody>
