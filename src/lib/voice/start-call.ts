@@ -15,10 +15,13 @@ const businessName = () => process.env.BUSINESS_NAME || 'Harbor Coffee Roasters'
 /** Values the agent's prompt reads. The expected challenge answer is deliberately absent. */
 export function dynamicVariablesFor(invoice: InvoiceRow, call: CallRow): Record<string, string> {
   const last4 = digitsOnly(invoice.bank_account).slice(-4);
+  const spoken = last4.split('').join(' '); // spaced so it is read digit by digit
   return {
     business_name: businessName(),
     vendor_name: invoice.vendor_name,
-    bank_last4: last4 ? last4.split('').join(' ') : 'unknown', // spaced so it is read digit by digit
+    // The prompt says "{{bank_account_phrase}}"; with no account on the invoice it must never read out "unknown".
+    bank_account_phrase: last4 ? `a new bank account ending in ${spoken}` : 'a new bank account',
+    bank_last4: last4 ? spoken : 'none', // kept for older agent prompts
     challenge_question: call.challenge_question ?? 'none',
     // P2 two-channel: the live agent's step 4b runs when code_email is not "none". Masked address only, never the code.
     code_email: call.email_code && call.code_check !== 'not_sent' && call.email_found ? maskEmail(call.email_found) : 'none',

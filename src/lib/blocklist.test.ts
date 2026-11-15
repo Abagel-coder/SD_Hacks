@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { displayBlockedValue, toBlocklistSummary } from './blocklist';
+import { blockedItemsText, displayBlockedValue, toBlocklistSummary } from './blocklist';
 
 describe('toBlocklistSummary', () => {
   it('coerces Postgres numeric strings into numbers', () => {
@@ -47,5 +47,24 @@ describe('displayBlockedValue', () => {
   it('shows domains and phones as-is', () => {
     expect(displayBlockedValue('domain', 'u1ine.com')).toBe('u1ine.com');
     expect(displayBlockedValue('phone', '+15555550199')).toBe('+15555550199');
+  });
+});
+
+describe('blockedItemsText', () => {
+  it('names the account and the lookalike sender domain', () => {
+    expect(blockedItemsText('004417886789', 'u1ine.com', 'uline.com'))
+      .toBe('the account ending 6789 and the sender domain u1ine.com are now on the shared blocklist');
+  });
+
+  it('names only the domain when the invoice had no bank account (never "ending unknown")', () => {
+    const text = blockedItemsText(null, 'u1ine.com', 'uline.com');
+    expect(text).toBe('the sender domain u1ine.com is now on the shared blocklist');
+    expect(text).not.toContain('unknown');
+  });
+
+  it("never names the vendor's real domain", () => {
+    expect(blockedItemsText('12346789', 'billing.uline.com', 'uline.com'))
+      .toBe('the account ending 6789 is now on the shared blocklist');
+    expect(blockedItemsText(null, 'uline.com', 'uline.com')).toBeNull();
   });
 });
