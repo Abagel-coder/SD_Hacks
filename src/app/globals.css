@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #efe4d4; /* light brown page */
+  --foreground: #2b1f15;
 }
 
 @theme inline {
@@ -10,6 +10,23 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+/* Light brown theme: every gray utility (text, borders, panels) becomes a warm brown, and white cards
+   become cream. Status colours (amber, red, green, blue) are untouched so their meaning stays. */
+@theme {
+  --color-white: #fffaf4;
+  --color-gray-50: #faf5ee;
+  --color-gray-100: #f3eadd;
+  --color-gray-200: #e6d7c3;
+  --color-gray-300: #d3bea1;
+  --color-gray-400: #b0977a;
+  --color-gray-500: #846a4f;
+  --color-gray-600: #6b543d;
+  --color-gray-700: #54412e;
+  --color-gray-800: #3d2e20;
+  --color-gray-900: #2b1f15;
+  --color-gray-950: #1c140d;
 }
 
 /* Invoice Guard is a light-theme dashboard; ignore OS dark preference so
