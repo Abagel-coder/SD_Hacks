@@ -3,6 +3,9 @@ import { isMock } from '@/lib/util';
 import { getConversation, MOCK_CONVERSATION } from '@/lib/voice/elevenlabs';
 import { failCall, finalizeCall } from '@/lib/voice/finalize';
 
+/** Longer than the agent's 180 s call limit, so only a call that never connected is given up on. */
+const NEVER_CONNECTED_MS = 3 * 60_000;
+
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const call = await getCall(id);
@@ -24,7 +27,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const body = (await req.json().catch(() => ({}))) as { conversationId?: unknown };
   const conversationId = call.conversation_id
     ?? (typeof body.conversationId === 'string' && body.conversationId ? body.conversationId : null);
-  if (!conversationId) return done();
+  if (!conversationId) {
+    // Without this, a browser call that never started would leave the invoice in verifying for good.
+    if (Date.now() - new Date(call.started_at).getTime() > NEVER_CONNECTED_MS) {
+      await failCall(call, 'the call never connected');
+    }
+    return done();
+  }
   if (!call.conversation_id) await updateCall(call.id, { conversationId });
 
   try {

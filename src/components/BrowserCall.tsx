@@ -3,6 +3,15 @@
 import { ConversationProvider, useConversationControls, useConversationStatus } from '@elevenlabs/react';
 import { useEffect, useRef, useState } from 'react';
 
+/** Tells the server which ElevenLabs conversation belongs to this call, so it can follow it. */
+function sync(callId: string, conversationId: string | null) {
+  return fetch(`/api/calls/${callId}/sync`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ conversationId }),
+  });
+}
+
 function CallControls({ callId }: { callId: string }) {
   const { startSession, endSession } = useConversationControls();
   const { status } = useConversationStatus();
@@ -15,13 +24,19 @@ function CallControls({ callId }: { callId: string }) {
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
       const res = await fetch(`/api/calls/${callId}/browser-session`);
-      if (!res.ok) throw new Error('Could not load the call details.');
+      if (!res.ok) {
+        const json = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(`Could not load the call details: ${json.error ?? `error ${res.status}`}`);
+      }
       const session = (await res.json()) as { agentId: string; dynamicVariables: Record<string, string> };
       // startSession returns nothing; the conversation id and connection errors arrive by callback.
       startSession({
         agentId: session.agentId,
         dynamicVariables: session.dynamicVariables,
-        onConnect: ({ conversationId: id }) => { conversationId.current = id; },
+        onConnect: ({ conversationId: id }) => {
+          conversationId.current = id;
+          void sync(callId, id);
+        },
         onError: (message) => setError(message),
       });
     } catch (err) {
@@ -33,11 +48,7 @@ function CallControls({ callId }: { callId: string }) {
     if (status === 'connected') wasConnected.current = true;
     if (status === 'disconnected' && wasConnected.current) {
       wasConnected.current = false;
-      void fetch(`/api/calls/${callId}/sync`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversationId: conversationId.current }),
-      });
+      void sync(callId, conversationId.current);
     }
   }, [status, callId]);
 
