@@ -5,20 +5,8 @@ import { AppNav } from '@/components/AppNav';
 import type { BacktestResult } from '@/lib/backtest/run';
 import type { CaseResult, Scorecard } from '@/lib/backtest/replay';
 import type { RiskRules } from '@/lib/risk/engine';
+import { REASON_TITLE as RULE_LABEL } from '@/lib/risk-labels';
 import type { RiskCode } from '@/lib/types';
-
-const RULE_LABEL: Record<RiskCode, string> = {
-  BLOCKLIST_HIT: 'On the scam blocklist',
-  BANK_CHANGED: 'Bank details changed',
-  LOOKALIKE_DOMAIN: 'Lookalike sender domain',
-  DOMAIN_MISMATCH: 'Sender domain mismatch',
-  NEW_DOMAIN: 'Newly registered domain',
-  AMOUNT_ANOMALY: 'Unusual amount',
-  URGENCY_OR_SECRECY: 'Pressure or secrecy language',
-  UNKNOWN_VENDOR: 'Unknown vendor',
-  AI_FLAGGED: 'Gemini flagged a warning sign',
-  NO_WEB_PRESENCE: 'Sender domain has no web presence',
-};
 
 function copy(rules: RiskRules): RiskRules {
   return { ...rules, points: { ...rules.points }, hardFreeze: { ...rules.hardFreeze } };
@@ -159,7 +147,7 @@ export default function BacktestPage() {
   const codes = rules ? (Object.keys(rules.points) as RiskCode[]) : [];
 
   return (
-    <main className="mx-auto max-w-5xl space-y-6 p-6 text-gray-900">
+    <main className="mx-auto w-full max-w-5xl space-y-6 p-6 text-gray-900">
       <AppNav current="backtest" />
 
       <header>

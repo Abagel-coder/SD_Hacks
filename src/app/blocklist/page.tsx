@@ -35,7 +35,7 @@ export default function BlocklistPage() {
   const entries = data?.entries ?? [];
 
   return (
-    <main className="mx-auto max-w-5xl space-y-6 p-6 text-gray-900">
+    <main className="mx-auto w-full max-w-5xl space-y-6 p-6 text-gray-900">
       <AppNav current="blocklist" />
 
       <header className="space-y-1">
@@ -60,38 +60,40 @@ export default function BlocklistPage() {
           domain land here.
         </p>
       ) : (
-        <table className="w-full text-left text-sm">
-          <thead className="border-b text-xs uppercase text-gray-500">
-            <tr>
-              <th className="py-2">Type</th>
-              <th>Value</th>
-              <th>From invoice</th>
-              <th className="text-right">Amount</th>
-              <th className="pl-4">Reason</th>
-              <th className="text-right">Added</th>
-            </tr>
-          </thead>
-          <tbody>
-            {entries.map((entry) => (
-              <tr key={entry.id} className="border-b align-middle *:py-2">
-                <td className="text-gray-700">{KIND_LABEL[entry.kind]}</td>
-                <td className="font-mono">{displayBlockedValue(entry.kind, entry.value)}</td>
-                <td>
-                  {entry.sourceInvoiceId ? (
-                    <Link href={`/invoices/${entry.sourceInvoiceId}`} className="underline-offset-2 hover:underline">
-                      {entry.vendorName ?? 'View invoice'}
-                    </Link>
-                  ) : (
-                    'n/a'
-                  )}
-                </td>
-                <td className="text-right tabular-nums">{entry.amount === null ? 'n/a' : money(entry.amount)}</td>
-                <td className="pl-4 text-gray-700">{entry.reason ?? 'n/a'}</td>
-                <td className="whitespace-nowrap text-right text-gray-600">{addedAt(entry.createdAt)}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-gray-200 text-xs uppercase text-gray-500">
+              <tr className="*:whitespace-nowrap *:px-2 *:py-2">
+                <th>Type</th>
+                <th>Value</th>
+                <th>From invoice</th>
+                <th className="text-right">Amount</th>
+                <th className="hidden sm:table-cell">Reason</th>
+                <th className="text-right">Added</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {entries.map((entry) => (
+                <tr key={entry.id} className="border-b border-gray-200 align-middle *:px-2 *:py-2">
+                  <td className="whitespace-nowrap text-gray-700">{KIND_LABEL[entry.kind]}</td>
+                  <td className="whitespace-nowrap font-mono">{displayBlockedValue(entry.kind, entry.value)}</td>
+                  <td className="whitespace-nowrap">
+                    {entry.sourceInvoiceId ? (
+                      <Link href={`/invoices/${entry.sourceInvoiceId}`} className="underline-offset-2 hover:underline">
+                        {entry.vendorName ?? 'View invoice'}
+                      </Link>
+                    ) : (
+                      'n/a'
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap text-right tabular-nums">{entry.amount === null ? 'n/a' : money(entry.amount)}</td>
+                  <td className="hidden text-gray-700 sm:table-cell">{entry.reason ?? 'n/a'}</td>
+                  <td className="whitespace-nowrap text-right text-gray-600">{addedAt(entry.createdAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </main>
   );
