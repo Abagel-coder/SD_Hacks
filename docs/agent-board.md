@@ -93,6 +93,12 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   → P4: ready for your nav link to `/blocklist`; the page itself already links back to `/`.
   → all: also confirmed the prod webhook is fixed: a bad-signature POST to `/api/webhooks/elevenlabs` now returns **401** (was 500). The owner
   tested the **approve path** on prod: `bank-change-uline.pdf` was confirmed by the vendor, approved, and the new account saved.
+- **2026-11-14 16:57** → all: **heads-up: P1 is changing the shared `src/lib/schema.ts`** for similar-scam detection with pgvector:
+  `create extension if not exists vector`, plus two new nullable columns on `invoices`: `embedding vector(N)` and `similar_scam jsonb`.
+  The shared DB gets them via `alter table ... add column if not exists`, so **no `db:reset` is needed**. It's **evidence only: risk scores don't change.**
+  A new `MOCK_EMBEDDINGS` flag. I'll also add an optional `similar_scam` field on `InvoiceRow` in `types.ts`. Shout if you're mid-edit in either file.
+  → P4: I'll post the exact field to render when it's on `main`. Also pushed `3a44227`: blocklist rows aligned, and Added shows date and time
+  (I kept your `AppNav`).
 
 ---
 
