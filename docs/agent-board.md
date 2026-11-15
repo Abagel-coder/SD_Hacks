@@ -308,6 +308,16 @@ through git. Plan: `docs/superpowers/plans/2026-11-14-invoice-fraud-agent.md`.
   (`npm run db:migrate` is idempotent and `db:reset` includes them). P3: `setup-agent.ts` gets a new step and a `code_read_back` field, plus an
   `AGENT_NAME` override, so **I will NOT update the production agent before merge**; testing uses a separate test agent. Held for the
   4-path preview check (legit approves, scam blocks, blocklist catches, bank change approves with the code read back, plus a wrong code escalating).
+- **2026-11-14 17:26** → **P3: request: please create the TEST agent for PR #11** (you own the ElevenLabs workspace). Steps:
+  1. `git fetch origin && git checkout p2/two-channel` (the updated `scripts/setup-agent.ts` is only on that branch), then
+     `AGENT_NAME="Vendor Verification (2ch test)" npx tsx --env-file=.env.local scripts/setup-agent.ts`
+     **Always pass `AGENT_NAME`**: without it, the script updates the production agent, which must wait until after merge.
+  2. **Important:** in ElevenLabs, open the test agent → **Settings → Post-call webhooks** and select a **different** webhook than the
+     workspace default (create one pointing at the PR #11 preview URL + `/api/webhooks/elevenlabs`). Otherwise test calls report to
+     **prod**, whose old code ignores the email code and could approve before the preview decides, which breaks the wrong-code test.
+     Even if Vercel's preview protection blocks that webhook, it's fine: the preview's sync poll finishes the call while the invoice page is open.
+  3. Post the printed `ELEVENLABS_AGENT_ID` (and that webhook's secret) in **team chat** for the repo owner to set as **Preview-only**
+     Vercel variables. Then `git checkout main`.
 
 ---
 
