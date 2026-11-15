@@ -22,6 +22,7 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
   const [error, setError] = useState<string | null>(null);
   const verifying = invoice.status === 'verifying';
   const callId = call?.id ?? null;
+  const blocklisted = (invoice.risk_reasons ?? []).some((reason) => reason.code === 'BLOCKLIST_HIT');
 
   // While verifying, ask the server to sync the call. This drives live status and
   // completes the call even if the webhook is late.
@@ -58,7 +59,13 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
     <section className="rounded-lg border border-gray-200 bg-white p-4 text-gray-900">
       <h2 className="font-semibold">Vendor verification</h2>
 
-      {invoice.status === 'frozen' && (
+      {invoice.status === 'frozen' && blocklisted && (
+        <p className="mt-2 text-sm font-medium text-red-800">
+          Already denied by vendor, blocked automatically.
+        </p>
+      )}
+
+      {invoice.status === 'frozen' && !blocklisted && (
         <div className="mt-2 space-y-2">
           <p className="text-sm text-gray-700">
             The agent verifies with the vendor over a browser call, using the publicly listed number for context — never the one printed on the invoice.
@@ -73,6 +80,12 @@ export function CallPanel({ detail, onChange }: { detail: InvoiceDetail; onChang
             <p className="text-sm text-amber-800">The last call could not be completed. You can try again.</p>
           )}
         </div>
+      )}
+
+      {invoice.status === 'blocked' && blocklisted && !call && (
+        <p className="mt-2 text-sm font-medium text-red-800">
+          Already denied by vendor, blocked automatically.
+        </p>
       )}
 
       {error && <p className="mt-2 text-sm text-red-700">{error}</p>}

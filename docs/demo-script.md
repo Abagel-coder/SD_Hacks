@@ -6,15 +6,21 @@ into the laptop microphone), Operator (second laptop, ready with the fallbacks b
 The team is **not using Twilio**. Live verification is the ElevenLabs browser call
 (`CALL_CHANNEL=browser`). Mock mode (`MOCK_CALL=1`) still flips the badge without a real call.
 
-## Before going on
+## Before presenting (do this right before going on stage)
 
-1. `npm run db:reset`
+Rehearsals leave the scam bank account (`…6789`) and `u1ine.com` on the shared blocklist. If you skip
+this reset, the first on-stage scam upload shows **BLOCKLIST_HIT** instead of the clean freeze story.
+
+1. `npm run db:reset` (clears invoices, calls, and the blocklist).
 2. Warm the Bright Data intel cache (live only; refuses mock flags):
    `MOCK_GEMINI=0 MOCK_BRIGHTDATA=0 npx tsx --env-file=.env.local scripts/warm-intel.ts`
-3. Open the production URL. Confirm 18 approved invoices.
-4. Laptop mic ready; allow microphone access when the browser asks. Vendor sits next to the laptop.
-5. `samples/legit-uline.pdf` and `samples/scam-uline.pdf` are on the desktop.
-6. The backup video is open in a tab.
+3. Open the production URL. Confirm 18 approved invoices and an empty blocklist story.
+4. **Do not upload any scam invoice until you are on stage.** Legit uploads for a mic/UI check are fine;
+   save `samples/scam-uline.pdf` for the live demo.
+5. Laptop mic ready; allow microphone access when the browser asks. Vendor sits next to the laptop.
+6. `samples/legit-uline.pdf` and `samples/scam-uline.pdf` are on the desktop (optional approve-path:
+   `samples/bank-change-uline.pdf` with sender `billing@uline.com` if you show a confirmed change).
+7. The backup video is open in a tab.
 
 ## Script
 
@@ -31,21 +37,24 @@ The team is **not using Twilio**. Live verification is the ElevenLabs browser ca
    u1ine.com with a number one. Score 100. The payment is frozen." Point at the Gemini explanation.
 4. **The call (60 s).** "Now the agent verifies, using the phone number Bright Data found on
    Uline's real website, never the number on the invoice — here as a live browser call through
-   ElevenLabs." Click **Verify in browser** (or **Verify by phone** if `MOCK_CALL=1` for the
-   mock path). Allow the mic. Vendor answers into the laptop: "Accounts receivable." Agent asks
-   about the bank change. Vendor: **"No. We never changed banks."**
+   ElevenLabs." Click **Verify in browser**. Allow the mic. Vendor answers into the laptop:
+   "Accounts receivable." Agent asks about the bank change. Vendor: **"No. We never changed banks."**
    Stay silent and let the audience watch the badge flip to **Blocked**.
 5. **The result (30 s).** Show the transcript and the audit log. "Every step the agent took is in
    Neon with its inputs and its reason. The scammer's account and domain are now on a shared
-   blocklist." Upload the scam invoice again: "Caught instantly, for every business."
+   blocklist." Upload the scam invoice again: "Caught instantly, for every business" (blocklist hit;
+   no verify button).
 6. **Close (15 s).** "Gemini reads, Bright Data fact-checks, our code decides, ElevenLabs calls,
    Neon remembers. If the vendor had said yes, it would have asked them the amount of their
    September invoice, which only the real vendor knows."
+   *(Optional)* Show `bank-change-uline.pdf` from `billing@uline.com`: freeze on a real bank change,
+   then Vendor confirms and answers the history check so the invoice becomes **Approved**.
 
 ## If something breaks
 
 | Problem | Do this |
 |---|---|
+| First scam upload shows BLOCKLIST_HIT / no clean freeze | You skipped the pre-stage reset — run `db:reset` + `warm-intel`, then continue |
 | Browser call does not connect within 10 seconds | Wait for Frozen, click **Verify in browser** again, re-allow the mic; Vendor answers into the laptop microphone |
 | Browser call still fails | Operator switches the projector to the second laptop, which runs locally with `MOCK_CALL=1` |
 | Upload hangs past 40 seconds | Reload and upload again; Operator sets `MOCK_BRIGHTDATA=1` on the local fallback |
@@ -53,13 +62,14 @@ The team is **not using Twilio**. Live verification is the ElevenLabs browser ca
 
 ## Rehearsal checklist (run three times; once with every `MOCK_*` flag set to 1)
 
+- [ ] Pre-stage: `db:reset` + `warm-intel`; no scam upload until the timed run
 - [ ] Legit invoice: approved, risk 0
-- [ ] Scam invoice: frozen, risk 70 or more, at least three reasons, explanation shown
+- [ ] Scam invoice: frozen, risk 70 or more, at least three reasons, explanation shown (not only blocklist)
 - [ ] Public web check shows uline.com and "No" for the sender match
 - [ ] Browser call connects (or mock path completes) within 10 seconds of the click
 - [ ] "We never changed banks" gives Blocked within 20 seconds of hanging up
 - [ ] Transcript and audit log are visible
-- [ ] Re-uploading the scam shows a blocklist reason
+- [ ] Re-uploading the scam shows a blocklist reason and **no** Verify button
 - [ ] After `npm run db:reset`, the confirmed path works: say "yes", then "one thousand two hundred
       eighty-four dollars and fifty cents"; the invoice becomes Approved
 - [ ] The whole run fits in 3 minutes
